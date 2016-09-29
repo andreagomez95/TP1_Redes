@@ -21,14 +21,15 @@ public class Client {
     public static void main(String[] args) throws IOException {
         String serverAddress = JOptionPane.showInputDialog(
             "Enter IP Address of a machine that is\n" +
-            "running the date service on port 9091:");
+            "running the date service on port 9090:");
         System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
-        Socket serverSocket = new Socket(serverAddress, 9091);
+        Socket serverSocket = new Socket(serverAddress, 9093);
         System.out.println("Client receiving package from server.");
         BufferedReader input =
             new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
         String answer = input.readLine();
         JOptionPane.showMessageDialog(null, answer);
+        serverSocket.close();
         System.exit(0);
         
     }

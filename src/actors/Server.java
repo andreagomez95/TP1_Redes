@@ -20,12 +20,13 @@ public class Server {
     public static void main(String[] args) throws IOException 
     {
     	
-        ServerSocket listener = new ServerSocket(9091);
+        ServerSocket listener = new ServerSocket(9093);
         System.out.println("Starting server at " + listener.getInetAddress() + " in port 9091");
         
         try 
         {
         	System.out.println("Server waiting to connect...");
+        	//TODO: change while condition to stop loop
             while (true) 
             {
                 Socket clientSocket = listener.accept();
