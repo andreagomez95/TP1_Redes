@@ -28,9 +28,10 @@ public class Frame
 		return idFrame;
 	}
 	
-	public void setData(char dato){
+	public void setData(char dato){ 
 		data= dato;
 	}
+	
 	public char getData(){
 		return data;
 	}

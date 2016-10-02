@@ -3,10 +3,12 @@ package actors;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
-//import java.util.AbstractQueue;
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JOptionPane;
 
@@ -15,54 +17,154 @@ import javax.swing.JOptionPane;
  */
 public class Client {
 
+		public static boolean hayACKnuevo=false;
 		public static FileHandler fh = new FileHandler();
 		public static String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
 
+		public static String serverAddress="";
+		
 		public static Socket serverSocket; // = new Socket(serverAddress, numServerSocket);
 		
 		public static int numServerSocket=9093; //Usuario debe poder meterlo
 		public static int numElemVentana; //Usuario debe poder meterlo
 		public static int num1eroVentana=0; //Usuario debe poder meterlo
 		public static int totalFrames=0; //Programa debe cambiarlo al leer los datos
+		public static long timeOut=1000; //Usuario debe poder meterlo
 		
-		public static Queue<Frame> colaPendientes = new ArrayDeque<Frame>();
-		public static Queue<Frame> colaVentana = new ArrayDeque<Frame>();
+		public static LinkedList <Frame> colaPendientes = new LinkedList<Frame>();
+		public static LinkedList <Frame> colaVentana = new LinkedList<Frame>();
 		
-		public static long timeout = Long.MIN_VALUE; //Usuario debe poder meterlo
 		
-	    /**
-	     * Runs the client as an application.  First it displays a dialog
-	     * box asking for the IP address or hostname of a host running
-	     * the date server, then connects to it and displays the date that
-	     * it serves.
-	     */
 		public static void ponerDatosEnFrames(String datos){
 			totalFrames=datos.length();
+			Frame a;
 			for(int i=0; i<totalFrames; i++){
-	              Frame a = new Frame(i,timeout);
-	              a.setData(datos.charAt(i));
+	              a = new Frame(i,timeOut);
+	              char d=datos.charAt(i);
+	              a.setData(d);
 	              colaPendientes.add(a);
 	         }
 		}
 		
+		
+		public static void creandoEstrucNec(String datos){
+			ponerDatosEnFrames(datos);
+			int numElemPasar=0;
+
+			if(totalFrames>numElemVentana){
+				numElemPasar=numElemVentana;
+			}else {
+				numElemPasar=totalFrames;
+			}
+			Frame a;
+			for(int i=0; i<numElemPasar; i++){
+				a = colaPendientes.pop();
+				colaVentana.add(a);
+			}
+		}
+		
+		public static int calcVentanaPendientes(){
+			int numElemV=totalFrames-num1eroVentana;
+			if(numElemV<numElemVentana){
+				return numElemV;
+			}
+			else{
+				return numElemVentana;
+			}	
+		}
+		
+		
+		
+		
+		//{}
+		public static void moverVentana(){
+			Frame a;
+			while (colaVentana.getFirst().getRecibido()==true){
+				colaVentana.pop();
+				a = colaPendientes.pop();
+				colaVentana.add(a);
+				num1eroVentana=num1eroVentana+1;
+			}
+		}
+		
+		
+		
+		public static void CicloRevisarTimeOut() throws IOException {
+			if(hayACKnuevo){
+				moverVentana();
+			}
+			int r=calcVentanaPendientes();
+			String segmento="";
+			Frame a;
+			long time;
+			for(int i=0; i<r; i++){
+				a=colaVentana.get(i);
+				time=TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
+				if((a.getTimeout()<time)&&(!a.getRecibido())){
+					//segmento=""; //---
+					segmento=Integer.toString(a.getIdFrame())+":"+a.getData();
+					enviarDatos(segmento);
+					a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
+				}
+	              
+	         }
+		}
+		
+		public static void enviarDatos(String datos)/*  throws IOException  */{//Hay que cambiarlo pero funciona temporalmente, creo
+			System.out.println("Sending segment.");
+			PrintWriter out;
+			try {
+				out = new PrintWriter(serverSocket.getOutputStream(), true);
+				out.println(datos);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+                
+			/*
+	        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
+
+				serverSocket = new Socket(serverAddress, numServerSocket);
+
+	        System.out.println("Client receiving package from server.");
+
+
+				BufferedReader input = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+
+				String answer = input.readLine();
+
+	        JOptionPane.showMessageDialog(null, answer);
+
+				serverSocket.close();
+
+	        System.exit(0);*/
+		}
+		
+		
+
+		
 		public static void main(String[] args) throws IOException {
 			String datosEntrada = fh.readUsingBuffer(filePath);
-	        
-			String serverAddress = "localhost";//Mejor mantenerlo en local host para que funcione bien.
-			//=JOptionPane.showInputDialog("Enter IP Address of a machine that is\n" + "running the date service on port 9090:");
-			//String serverAddress = "hola";
-			
-			ponerDatosEnFrames(datosEntrada);
+	        serverAddress = "localhost"; //Mejor mantenerlo en local host para que funcione bien.
+	        creandoEstrucNec(datosEntrada);
+	     /*   while (calcVentanaPendientes()!=0){
+	        	CicloRevisarTimeOut();
+	        }*/
+	        //enviarDatos("hello world");// no fun bien bien. Creo que es porque no hay un listener del otro lado
 	        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
-	        /*Socket*/ serverSocket = new Socket(serverAddress, numServerSocket);
+	        serverSocket = new Socket(serverAddress, numServerSocket);
+	        
+	        
 	        System.out.println("Client receiving package from server.");
 	        BufferedReader input =
 	            new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 	        String answer = input.readLine();
 	        JOptionPane.showMessageDialog(null, answer);
+	        
+	        
 	        serverSocket.close();
 	        System.exit(0);
-	        
+
 	    }
 		
 	}
@@ -77,58 +179,17 @@ public class Client {
             }
         }
         */
+//http://www.dreamincode.net/forums/topic/113638-sending-a-string-through-a-socket/
+/*
+ * ponerDatosEnFrames(datosEntrada);
+	        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
+	        serverSocket = new Socket(serverAddress, numServerSocket);
+	        System.out.println("Client receiving package from server.");
+	        BufferedReader input =
+	            new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+	        String answer = input.readLine();
+	        JOptionPane.showMessageDialog(null, answer);
+	        serverSocket.close();
+	        System.exit(0);*/
+ 
 
-
-
-
-
-
-
-
-    /**
-     * Runs the client as an application.  First it displays a dialog
-     * box asking for the IP address or hostname of a host running
-     * the date server, then connects to it and displays the date that
-     * it serves.
-     */
-
-
-
-
-
-	/*
-    public static void main(String[] args) throws IOException {
-        String serverAddress = JOptionPane.showInputDialog(
-            "Enter IP Address of a machine that is\n" +
-            "running the date service on port 9090:");
-        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
-        Socket serverSocket = new Socket(serverAddress, 9093);
-        System.out.println("Client receiving package from server.");
-        BufferedReader input =
-            new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-        String answer = input.readLine();
-        JOptionPane.showMessageDialog(null, answer);
-        serverSocket.close();
-        System.exit(0);
-        
-    }*/
-	
-	
-	
-	/* v2
-    public static void main(String[] args) throws IOException {
-        String serverAddress = JOptionPane.showInputDialog(
-            "Enter IP Address of a machine that is\n" +
-            "running the date service on port 9090:");
-        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
-        Socket serverSocket = new Socket(serverAddress, numServerSocket);
-        System.out.println("Client receiving package from server.");
-        BufferedReader input =
-            new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-        String answer = input.readLine();
-        JOptionPane.showMessageDialog(null, answer);
-        serverSocket.close();
-        System.exit(0);
-        
-    }
-    */
