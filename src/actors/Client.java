@@ -4,8 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.LinkedList;
-
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JOptionPane;
 
@@ -14,15 +15,19 @@ import javax.swing.JOptionPane;
  */
 public class Client {
 
+		public static boolean hayACKnuevo=false;
 		public static FileHandler fh = new FileHandler();
 		public static String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
 
+		public static String serverAddress="";
+		
 		public static Socket serverSocket; // = new Socket(serverAddress, numServerSocket);
 		
 		public static int numServerSocket=9093; //Usuario debe poder meterlo
 		public static int numElemVentana; //Usuario debe poder meterlo
 		public static int num1eroVentana=0; //Usuario debe poder meterlo
 		public static int totalFrames=0; //Programa debe cambiarlo al leer los datos
+		public static long timeOut=1000; //Usuario debe poder meterlo
 		
 		public static LinkedList <Frame> colaPendientes = new LinkedList<Frame>();
 		public static LinkedList <Frame> colaVentana = new LinkedList<Frame>();
@@ -30,8 +35,9 @@ public class Client {
 		
 		public static void ponerDatosEnFrames(String datos){
 			totalFrames=datos.length();
+			Frame a;
 			for(int i=0; i<totalFrames; i++){
-	              Frame a = new Frame(i);
+	              a = new Frame(i);
 	              char d=datos.charAt(i);
 	              a.setData(d);
 	              colaPendientes.add(a);
@@ -48,49 +54,90 @@ public class Client {
 			}else {
 				numElemPasar=totalFrames;
 			}
+			Frame a;
 			for(int i=0; i<numElemPasar; i++){
-				Frame a = colaPendientes.pop();
+				a = colaPendientes.pop();
 				colaVentana.add(a);
 			}
 		}
 		
 		public static int calcVentanaPendientes(){
-			return totalFrames-num1eroVentana;
+			int numElemV=totalFrames-num1eroVentana;
+			if(numElemV<numElemVentana){
+				return numElemV;
+			}
+			else{
+				return numElemVentana;
+			}	
 		}
+		
+		
+		
+		
 		//{}
 		public static void moverVentana(){
-			if (colaVentana.getFirst().getRecibido()==true){
+			Frame a;
+			while (colaVentana.getFirst().getRecibido()==true){
 				colaVentana.pop();
-				Frame a = colaPendientes.pop();
+				a = colaPendientes.pop();
 				colaVentana.add(a);
 				num1eroVentana=num1eroVentana+1;
-				moverVentana();
 			}
 		}
 		
 		
+		
+		public static void CicloRevisarTimeOut(){
+			if(hayACKnuevo){
+				moverVentana();
+			}
+			int r=calcVentanaPendientes();
+			String segmento="";
+			Frame a;
+			long time;
+			for(int i=0; i<r; i++){
+				a=colaVentana.get(i);
+				time=TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
+				if((a.getTimeout()<time)&&(!a.getRecibido())){
+					//segmento=""; //---
+					segmento=Integer.toString(a.getIdFrame())+":"+a.getData();
+					a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
+				}
+	              
+	         }
+		}
+		
+		public static void enviarDatos(String datos)throws IOException {//Hay que cambiarlo pero funciona temporalmente, creo
+			
+	        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
+
+				serverSocket = new Socket(serverAddress, numServerSocket);
+
+	        System.out.println("Client receiving package from server.");
+
+
+				BufferedReader input = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+
+				String answer = input.readLine();
+
+	        JOptionPane.showMessageDialog(null, answer);
+
+				serverSocket.close();
+
+	        System.exit(0);
+		}
 		
 		
 
 		
 		public static void main(String[] args) throws IOException {
 			String datosEntrada = fh.readUsingBuffer(filePath);
-	        
-			String serverAddress = "localhost";//Mejor mantenerlo en local host para que funcione bien.
+	        serverAddress = "localhost"; //Mejor mantenerlo en local host para que funcione bien.
+	        creandoEstrucNec(datosEntrada);
+	        while (calcVentanaPendientes()!=0){
+	        	CicloRevisarTimeOut();
+	        }
 
-
-			
-			ponerDatosEnFrames(datosEntrada);
-	        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
-	        /*Socket*/ serverSocket = new Socket(serverAddress, numServerSocket);
-	        System.out.println("Client receiving package from server.");
-	        BufferedReader input =
-	            new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-	        String answer = input.readLine();
-	        JOptionPane.showMessageDialog(null, answer);
-	        serverSocket.close();
-	        System.exit(0);
-	        
 	    }
 		
 	}
@@ -105,4 +152,17 @@ public class Client {
             }
         }
         */
+
+/*
+ * ponerDatosEnFrames(datosEntrada);
+	        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
+	        serverSocket = new Socket(serverAddress, numServerSocket);
+	        System.out.println("Client receiving package from server.");
+	        BufferedReader input =
+	            new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+	        String answer = input.readLine();
+	        JOptionPane.showMessageDialog(null, answer);
+	        serverSocket.close();
+	        System.exit(0);*/
+ 
 

@@ -31,7 +31,7 @@ public class Frame
 	public void setData(char dato){ //public static void setData(char dato){
 		data= dato;
 	}
-	public static char getData(){
+	public char getData(){
 		return data;
 	}
 	
