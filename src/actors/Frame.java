@@ -13,39 +13,39 @@ public class Frame
 	
 	private static char data;
 	
-	public Frame(int id) 
+	public Frame(int id, long time) 
 	{
 		idFrame = id;
 		data = ' ';
 		recibido = false;
-		timeout = Long.MIN_VALUE;
+		timeout = time;
 	}
 	
-	public static void setIdFrame(int dato){
+	public void setIdFrame(int dato){
 		idFrame= dato;
 	}
-	public static int getIdFrame(){
+	public int getIdFrame(){
 		return idFrame;
 	}
 	
-	public static void setData(char dato){
+	public void setData(char dato){
 		data= dato;
 	}
-	public static char getData(){
+	public char getData(){
 		return data;
 	}
 	
-	public static void setRecibido(boolean dato){
+	public void setRecibido(boolean dato){
 		recibido= dato;
 	}
-	public static boolean getRecibido(){
+	public boolean getRecibido(){
 		return recibido;
 	}
 	
-	public static void setTimeout(long dato){
+	public void setTimeout(long dato){
 		timeout= dato;
 	}
-	public static long getTimeout(){
+	public long getTimeout(){
 		return timeout;
 	}
 

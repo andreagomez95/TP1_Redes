@@ -27,6 +27,9 @@ public class Client {
 		
 		public static Queue<Frame> colaPendientes = new ArrayDeque<Frame>();
 		public static Queue<Frame> colaVentana = new ArrayDeque<Frame>();
+		
+		public static long timeout = Long.MIN_VALUE; //Usuario debe poder meterlo
+		
 	    /**
 	     * Runs the client as an application.  First it displays a dialog
 	     * box asking for the IP address or hostname of a host running
@@ -36,7 +39,7 @@ public class Client {
 		public static void ponerDatosEnFrames(String datos){
 			totalFrames=datos.length();
 			for(int i=0; i<totalFrames; i++){
-	              Frame a = new Frame(i);
+	              Frame a = new Frame(i,timeout);
 	              a.setData(datos.charAt(i));
 	              colaPendientes.add(a);
 	         }

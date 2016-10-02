@@ -18,16 +18,14 @@ public class FileHandler
 
 
     
-    public void writeUsingBuffer() throws IOException
+    public void writeUsingBuffer(String mycontent, String filePath) throws IOException
     {
     	BufferedWriter bw = null;
         try
         {
-		  	 String mycontent = "This String would be written" +
-		  	    " to the specified File";
 		  	 
 		      //Specify the file name and path here
-		  	  File file = new File("C:/Users/USUARIO/Documents/sourceFile.txt");
+		  	  File file = new File(filePath);
 		
 		  	  if (!file.exists()) 
 		  	  {
