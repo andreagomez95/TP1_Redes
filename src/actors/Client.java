@@ -19,12 +19,14 @@ public class Client {
 		public static String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
 
 		public static Socket serverSocket; // = new Socket(serverAddress, numServerSocket);
+		
 		public static int numServerSocket=9093; //Usuario debe poder meterlo
 		public static int numElemVentana; //Usuario debe poder meterlo
-		public static int num1eroVentana; //Usuario debe poder meterlo
+		public static int num1eroVentana=0; //Usuario debe poder meterlo
+		public static int totalFrames=0; //Programa debe cambiarlo al leer los datos
 		
-		public Queue<Frame> colaPendientes = new ArrayDeque<Frame>();
-		public Queue<Frame> colaVentana = new ArrayDeque<Frame>();
+		public static Queue<Frame> colaPendientes = new ArrayDeque<Frame>();
+		public static Queue<Frame> colaVentana = new ArrayDeque<Frame>();
 	    /**
 	     * Runs the client as an application.  First it displays a dialog
 	     * box asking for the IP address or hostname of a host running
@@ -32,7 +34,12 @@ public class Client {
 	     * it serves.
 	     */
 		public static void ponerDatosEnFrames(String datos){
-			
+			totalFrames=datos.length();
+			for(int i=0; i<totalFrames; i++){
+	              Frame a = new Frame(i);
+	              a.setData(datos.charAt(i));
+	              colaPendientes.add(a);
+	         }
 		}
 		
 		public static void main(String[] args) throws IOException {
@@ -56,12 +63,36 @@ public class Client {
 	    }
 		
 	}
+	/*int p=e.cola.poll();
+       if(e.esperando==p){
+            e.esperando++;
+            e.ack=e.esperando;
+            e.ultimFramReci.add(p);
+            e.bRecibioBien=e.bRecibioBien+1;
+            if(e.ultimFramReci.size()>20){
+                e.ultimFramReci.poll();
+            }
+        }
+        */
+
+
+
+
+
+
+
+
     /**
      * Runs the client as an application.  First it displays a dialog
      * box asking for the IP address or hostname of a host running
      * the date server, then connects to it and displays the date that
      * it serves.
      */
+
+
+
+
+
 	/*
     public static void main(String[] args) throws IOException {
         String serverAddress = JOptionPane.showInputDialog(
