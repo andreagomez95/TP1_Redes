@@ -55,15 +55,20 @@ public class FileHandler
 	  	}
     }
     
-    public void readUsingBuffer(String filePatch) throws IOException
+    public String readUsingBuffer(String filePatch) throws IOException
     {
         BufferedReader br = new BufferedReader(new FileReader(filePatch));
+        
         String line = br.readLine();
+        String result=line;
+        //como se supone que todos los datos vienen juntos talvez no sea necesario el ciclo
         while(line != null)
         {
             System.out.println(line);
             line = br.readLine();
+            result = result + line;
         }
         br.close();
+        return result;
     }
 }
