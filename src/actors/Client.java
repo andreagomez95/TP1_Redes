@@ -3,8 +3,10 @@ package actors;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
@@ -87,7 +89,7 @@ public class Client {
 		
 		
 		
-		public static void CicloRevisarTimeOut(){
+		public static void CicloRevisarTimeOut() throws IOException {
 			if(hayACKnuevo){
 				moverVentana();
 			}
@@ -101,14 +103,25 @@ public class Client {
 				if((a.getTimeout()<time)&&(!a.getRecibido())){
 					//segmento=""; //---
 					segmento=Integer.toString(a.getIdFrame())+":"+a.getData();
+					enviarDatos(segmento);
 					a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
 				}
 	              
 	         }
 		}
 		
-		public static void enviarDatos(String datos)throws IOException {//Hay que cambiarlo pero funciona temporalmente, creo
-			
+		public static void enviarDatos(String datos)/*  throws IOException  */{//Hay que cambiarlo pero funciona temporalmente, creo
+			System.out.println("Sending segment.");
+			PrintWriter out;
+			try {
+				out = new PrintWriter(serverSocket.getOutputStream(), true);
+				out.println(datos);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+                
+			/*
 	        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
 
 				serverSocket = new Socket(serverAddress, numServerSocket);
@@ -124,7 +137,7 @@ public class Client {
 
 				serverSocket.close();
 
-	        System.exit(0);
+	        System.exit(0);*/
 		}
 		
 		
@@ -134,9 +147,23 @@ public class Client {
 			String datosEntrada = fh.readUsingBuffer(filePath);
 	        serverAddress = "localhost"; //Mejor mantenerlo en local host para que funcione bien.
 	        creandoEstrucNec(datosEntrada);
-	        while (calcVentanaPendientes()!=0){
+	     /*   while (calcVentanaPendientes()!=0){
 	        	CicloRevisarTimeOut();
-	        }
+	        }*/
+	        //enviarDatos("hello world");// no fun bien bien. Creo que es porque no hay un listener del otro lado
+	        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
+	        serverSocket = new Socket(serverAddress, numServerSocket);
+	        
+	        
+	        System.out.println("Client receiving package from server.");
+	        BufferedReader input =
+	            new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+	        String answer = input.readLine();
+	        JOptionPane.showMessageDialog(null, answer);
+	        
+	        
+	        serverSocket.close();
+	        System.exit(0);
 
 	    }
 		
@@ -152,7 +179,7 @@ public class Client {
             }
         }
         */
-
+//http://www.dreamincode.net/forums/topic/113638-sending-a-string-through-a-socket/
 /*
  * ponerDatosEnFrames(datosEntrada);
 	        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
