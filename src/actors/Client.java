@@ -130,13 +130,14 @@ public class Client {
 			Scanner scan = new Scanner(System.in);
 			System.out.println("Please introduce the desired window size: ");
 			windowSize = scan.nextInt();
+			scan.nextLine();
 			
 			System.out.println("Please introduce the file path: ");
 			filePath = scan.nextLine();
 			
 			System.out.println("Please introduce the port you want to connect to: ");
 			port = scan.nextInt();
-			
+			scan.nextLine();
 			System.out.println("Do you want to run the simulation in debug mode? (y/n): ");
 			String i = scan.nextLine();
 			if((i.charAt(0)=='y')||(i.charAt(0)=='Y')){
@@ -161,7 +162,7 @@ public class Client {
 	        System.out.println("Client connecting to server at " + serverAddress + " in port "+port);
 	        serverSocket = new Socket(serverAddress, port);
 	        out = new PrintWriter(serverSocket.getOutputStream(), true);
-	        //enviarDatos("13:2");// no fun bien bien. Creo que es porque no hay un listener del otro lado
+
 	        
 	        serverSocket.close();
 	        System.exit(0);
@@ -169,62 +170,3 @@ public class Client {
 	    }
 		
 	}
-
-
-	/*int p=e.cola.poll();
-       if(e.esperando==p){
-            e.esperando++;
-            e.ack=e.esperando;
-            e.ultimFramReci.add(p);
-            e.bRecibioBien=e.bRecibioBien+1;
-            if(e.ultimFramReci.size()>20){
-                e.ultimFramReci.poll();
-            }
-        }
-        */
-//http://www.dreamincode.net/forums/topic/113638-sending-a-string-through-a-socket/
-/*
- * ponerDatosEnFrames(datosEntrada);
-	        System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
-	        serverSocket = new Socket(serverAddress, port);
-	        System.out.println("Client receiving package from server.");
-	        BufferedReader input =
-	            new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-	        String answer = input.readLine();
-	        JOptionPane.showMessageDialog(null, answer);
-	        serverSocket.close();
-	        System.exit(0);*/
- 
-
-/*public static void enviarDatos(String datos)/*  throws IOException  * /{//Hay que cambiarlo pero funciona temporalmente, creo
-
-System.out.println("Sending segment.");
-PrintWriter out;
-try {
-	out = new PrintWriter(serverSocket.getOutputStream(), true);
-	out.println(datos);
-} catch (IOException e) {
-	// TODO Auto-generated catch block
-	e.printStackTrace();
-}
-    */
-
-
-/*
-System.out.println("Client connecting to server at " + serverAddress + " in port 9091");
-
-	serverSocket = new Socket(serverAddress, port);
-
-System.out.println("Client receiving package from server.");
-
-
-	BufferedReader input = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-
-	String answer = input.readLine();
-
-JOptionPane.showMessageDialog(null, answer);
-
-	serverSocket.close();
-
-System.exit(0);
-}*/
