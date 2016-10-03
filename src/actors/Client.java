@@ -10,16 +10,20 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.net.ServerSocket;
-import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.Scanner;
 import javax.swing.JOptionPane;
 
 /**
  * Trivial client for the date server.
  */
-public class Client {
 
+
+
+
+
+
+public class Client {
+		//Variables globales
 		public static boolean hayACKnuevo=false;
 		public static boolean debugMode=false;
 		public static FileHandler fh = new FileHandler();
@@ -32,100 +36,44 @@ public class Client {
 		
 		public static Socket serverSocket; // = new Socket(serverAddress, port);
 		
-		public static int port;//=9093; //Usuario debe poder meterlo
-		public static int windowSize; //Usuario debe poder meterlo
-		public static int num1eroVentana=0; //Usuario debe poder meterlo
+		public static int port;//=9093; 
+		public static int windowSize;
+		public static int num1eroVentana=0; 
 		public static int totalFrames=0; //Programa debe cambiarlo al leer los datos
-		public static long timeOut;//=1000; //Usuario debe poder meterlo
+		public static long timeOut;//=1000; 
 		public static long inicializarTimeOut=Long.MIN_VALUE; //De este modo siempre sale que vencio el timeout si no se ha enviado el dato antes.
 		
-		public static LinkedList <Frame> colaPendientes = new LinkedList<Frame>();
-		public static LinkedList <Frame> colaVentana = new LinkedList<Frame>();
+		public static LinkedList <Frame> colaPendientes;// = new LinkedList<Frame>();
+		public static LinkedList <Frame> colaVentana;// = new LinkedList<Frame>();
 		
 		
-		public static void ponerDatosEnFrames(String datos){
-			totalFrames=datos.length();
-			Frame a;
-			for(int i=0; i<totalFrames; i++){
-	              a = new Frame(i,inicializarTimeOut);
-	              char d=datos.charAt(i);
-	              a.setData(d);
-	              colaPendientes.add(a);
-	         }
-		}
+		public static BufferedReader in; 
 		
 		
-		public static void creandoEstrucNec(String datos){
-			ponerDatosEnFrames(datos);
-			int numElemPasar=0;
-
-			if(totalFrames>windowSize){
-				numElemPasar=windowSize;
-			}else {
-				numElemPasar=totalFrames;
-			}
-			Frame a;
-			for(int i=0; i<numElemPasar; i++){
-				a = colaPendientes.pop();
-				colaVentana.add(a);
-			}
-		}
+		public static Thread hiloACK = new Thread () {
+			  public void run () {
+				  hiloRecibeACK();
+				  try {
+					this.finalize();
+				  } catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				  }
+			  }
+		};
+		public static Thread hiloEnvia = new Thread () {
+			  public void run () {
+				  hiloEnviaFrames();
+				  try {
+					  this.finalize();
+				  } catch (Throwable e) {
+					  // TODO Auto-generated catch block
+					  e.printStackTrace();
+				  }
+			  }
+		};
 		
-		public static int calcVentanaPendientes(){
-			int numElemV=totalFrames-num1eroVentana;
-			if(numElemV<windowSize){
-				return numElemV;
-			}
-			else{
-				return windowSize;
-			}	
-		}
-		
-		
-		
-		
-		//{}
-		public static void moverVentana(){
-			Frame a;
-			while (colaVentana.getFirst().getRecibido()==true){
-				colaVentana.pop();
-				a = colaPendientes.pop();
-				colaVentana.add(a);
-				num1eroVentana=num1eroVentana+1;
-			}
-		}
-		
-		
-		
-		public static void CicloRevisarTimeOut(){
-			//if(hayACKnuevo){
-				moverVentana();
-			//}
-			int r=calcVentanaPendientes();
-			String segmento="";
-			Frame a;
-			long time;
-			for(int i=0; i<r; i++){
-				a=colaVentana.get(i);
-				time=TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
-				if((a.getTimeout()<time)&&(!a.getRecibido())){
-					//segmento=""; //---
-					segmento=Integer.toString(a.getIdFrame())+":"+a.getData();
-					enviarDatos(segmento);
-					a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
-				}
-	              
-	         }
-		}
-		
-		public static void enviarDatos(String datos)/*  throws IOException  */{//Hay que cambiarlo pero funciona temporalmente, creo
-			
-			System.out.println("Sending segment.");
-			out.println(datos);
-			out.flush();
-			System.out.println("Segment sent.");
-		}
-		
+		//Pide al usuario datos de como desea correr la simulacion
 		public static void setVariables(){
 			Scanner scan = new Scanner(System.in);
 			System.out.println("Please introduce the desired window size: ");
@@ -150,7 +98,138 @@ public class Client {
 			scan.close();
 		}
 		
+		
+		
+		//Mete los datos del archivo indicado en los diferentes frames
+		public static void ponerDatosEnFrames(String datos){
+			totalFrames=datos.length()-4;//////////////////////////////////Revisar esto
+			Frame a;
+			for(int i=0; i<totalFrames; i++){
+	              a = new Frame(i,inicializarTimeOut);
+	              char d=datos.charAt(i);
+	              a.setData(d);
+	              a.setIdFrame(i);
+	              colaPendientes.addLast(a);
+	              System.out.println("Creando frame: " +i +":"+d);
+	              System.out.println("Creando frame: " +a.getIdFrame() +":"+a.getData());
+	         }
+		}
+		
+		
+		public static void creandoEstrucNec(String datos){
+			ponerDatosEnFrames(datos);
+			int numElemPasar=0;
 
+			if(totalFrames>windowSize){
+				numElemPasar=windowSize;
+			}else {
+				numElemPasar=totalFrames;
+			}
+			Frame a;
+			System.out.println("Metiendo frames en la ventana: ");
+			for(int i=0; i<numElemPasar; i++){
+				a = colaPendientes.pop();//.pollFirst();
+				System.out.print(a.getIdFrame()+": "+a.getData()+", ");
+				colaVentana.addLast(a);
+			}
+			System.out.println( " ");
+		}
+		
+		public static int calcVentanaPendientes(){
+			int numElemV=totalFrames-num1eroVentana;
+			if(numElemV<windowSize){
+				return numElemV;
+			}
+			else{
+				return windowSize;
+			}	
+		}
+		
+		public static void mostrarVentana(){
+			int j=colaVentana.size();
+			System.out.println("Ventana: ");
+			for(int i=0; i<j; i++){
+				System.out.print(colaVentana.get(i).getIdFrame()+":"+colaVentana.get(i).getData()+", ");
+			}
+			System.out.println( " ");
+		}
+		
+		
+		//{}
+		public static void moverVentana(){
+			Frame a;
+			while (colaVentana.getFirst().getRecibido()==true){
+				colaVentana.pop();
+				a = colaPendientes.pop();//.pop();
+				colaVentana.addLast(a);
+				num1eroVentana=num1eroVentana+1;
+			}
+			mostrarVentana();
+		}
+		
+		
+		
+		public static void CicloRevisarTimeOut(int pendientes){
+			//if(hayACKnuevo){
+				moverVentana();
+			//}
+			//int r=pendientes;//calcVentanaPendientes();
+			String segmento="";
+			Frame a;
+			long time;
+			for(int i=0; i<pendientes; i++){
+				a=colaVentana.get(i);
+				time=TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
+				if((a.getTimeout()<time)&&(!a.getRecibido())){
+					//segmento=""; //---
+					segmento=Integer.toString(a.getIdFrame())+":"+a.getData();
+					enviarDatos(segmento);
+					a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
+				}
+	              
+	         }
+		}
+		
+		public static void enviarDatos(String datos)/*  throws IOException  */{//Hay que cambiarlo pero funciona temporalmente, creo
+			
+			System.out.println("Sending segment.");
+			out.println(datos);
+			out.flush();
+			System.out.println("Segment sent.");
+		}
+		
+		//{}
+		public static void hiloEnviaFrames(){
+			int pendientes=calcVentanaPendientes();
+	        while (pendientes!=0){
+	        	CicloRevisarTimeOut(pendientes);
+	        }
+		}
+
+		public static void hiloRecibeACK(){
+			//int pendientes=calcVentanaPendientes();
+			int ack=-1;
+			int index=0;
+			Frame a;
+	        while (calcVentanaPendientes()!=0){
+	        	//CicloRevisarTimeOut(pendientes);
+	        	try {
+					String input = in.readLine();
+					ack=Integer.parseInt(input);
+					index=ack-num1eroVentana;
+					if(index>0){
+						a=colaVentana.get(index);
+						if(a.getIdFrame()==ack){
+							a.setRecibido(true);
+							hayACKnuevo=true;
+						}
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+		}
 		
 		public static void main(String[] args) throws IOException {
 			setVariables();
@@ -158,11 +237,21 @@ public class Client {
 	        
 	        creandoEstrucNec(datosEntrada);
 	        
+	        colaPendientes= new LinkedList<Frame>();
+			colaVentana=new LinkedList<Frame>();
+	        
+	        
 	        serverAddress = "localhost"; //Mejor mantenerlo en local host para que funcione bien.
 	        System.out.println("Client connecting to server at " + serverAddress + " in port "+port);
 	        serverSocket = new Socket(serverAddress, port);
 	        out = new PrintWriter(serverSocket.getOutputStream(), true);
-
+	        
+	        
+	        in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+	        
+	        hiloACK.start();
+	        hiloEnvia.start();
+	        
 	        
 	        serverSocket.close();
 	        System.exit(0);
