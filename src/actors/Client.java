@@ -47,18 +47,12 @@ public class Client {
 		public static LinkedList <Frame> colaVentana = new LinkedList<Frame>();
 		
 		
-		//public static LinkedList <Frame> colaPendientes;// = new LinkedList<Frame>();
-		//public static LinkedList <Frame> colaVentana;// = new LinkedList<Frame>();
-		
 		public  BufferedReader in; 
 		
 		public Client() throws IOException{
-			setVariables();
+			setVariables(true);
 			String datosEntrada = fh.readUsingBuffer(filePath);
 	        
-			//colaPendientes= new LinkedList<Frame>();
-			//colaVentana=new LinkedList<Frame>();
-			
 	        creandoEstrucNec(datosEntrada);
 	        
 	        
@@ -105,26 +99,40 @@ public class Client {
 		};
 		
 		//Pide al usuario datos de como desea correr la simulacion
-		public  void setVariables(){
+		public  void setVariables(boolean prueba){
+			
 			Scanner scan = new Scanner(System.in);
-			System.out.println("Please introduce the desired window size: ");
-			windowSize = scan.nextInt();
-			scan.nextLine();
-			
-			System.out.println("Please introduce the file path: ");
-			filePath = scan.nextLine();
-			
-			System.out.println("Please introduce the port you want to connect to: ");
-			port = scan.nextInt();
-			scan.nextLine();
-			System.out.println("Do you want to run the simulation in debug mode? (y/n): ");
-			String i = scan.nextLine();
-			if((i.charAt(0)=='y')||(i.charAt(0)=='Y')){
+			if(!prueba){
+				System.out.println("Please introduce the desired window size: ");
+				windowSize = scan.nextInt();
+				scan.nextLine();
+				
+				System.out.println("Please introduce the file path: ");
+				filePath = scan.nextLine();
+				
+				System.out.println("Please introduce the port you want to connect to: ");
+				port = scan.nextInt();
+				scan.nextLine();
+				System.out.println("Do you want to run the simulation in debug mode? (y/n): ");
+				String i = scan.nextLine();
+				if((i.charAt(0)=='y')||(i.charAt(0)=='Y')){
+					debugMode= true;
+				}
+				
+				System.out.println("Please introduce the desired timeout: (in ms)");
+				timeOut = scan.nextInt();
+			} else {
+
+				windowSize = 4;
+
+				filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
+				
+				port = 9093;
+				
 				debugMode= true;
+				
+				timeOut = 10000;
 			}
-			
-			System.out.println("Please introduce the desired timeout: (in ms)");
-			timeOut = scan.nextInt();
 			
 			scan.close();
 		}
