@@ -151,17 +151,7 @@ public class Client {
 	              a.setData(d);
 	              a.setIdFrame(i);
 	              colaPendientes.add(a);
-	              System.out.println("Creando frame: " +i +":"+d);
-	              mostrarPendientes();
-	  			  mostrarVentana();
-	              /*System.out.println("Creando frame: " +a.getIdFrame() +":"+a.getData());
-	              System.out.println("Creando frame: " +colaPendientes.get(i).getIdFrame() +":"+colaPendientes.get(i).getData());
-	              if(i!=0){
-	              System.out.println("Creando frame: " +colaPendientes.get(i-1).getIdFrame() +":"+colaPendientes.get(i-1).getData());
-	              }*/
 	         }
-			mostrarPendientes();
-			mostrarVentana();
 			System.out.println("Sale crear frames: ");
 		}
 		
@@ -179,7 +169,7 @@ public class Client {
 			Frame b;
 			System.out.println("Metiendo frames en la ventana: ");
 			for(int i=0; i<numElemPasar; i++){
-				a = colaPendientes.pop();//.pollFirst();
+				a = colaPendientes.pop();
 				b=new Frame(a.getIdFrame(),inicializarTimeOut);
 				b.setData(a.getData());
 				System.out.print(b.getIdFrame()+": "+b.getData()+", ");
@@ -224,12 +214,8 @@ public class Client {
 		public  void moverVentana(){
 			Frame a;
 			Frame b;
-			while (colaVentana.getFirst().getRecibido()==true){
-				/*colaVentana.pop();
-				a = colaPendientes.pop();//.pop();
-				a=new Frame()
-				colaVentana.addLast(a);*/
-				a = colaPendientes.pop();//.pollFirst();
+			while (colaVentana.getFirst()!=null && colaVentana.getFirst().getRecibido()==true){
+				a = colaPendientes.pop();
 				b=new Frame(a.getIdFrame(),inicializarTimeOut);
 				b.setData(a.getData());
 				System.out.print(b.getIdFrame()+": "+b.getData()+", ");
@@ -241,28 +227,30 @@ public class Client {
 		
 		
 		
-		public  void CicloRevisarTimeOut(int pendientes){
-			//if(hayACKnuevo){
-				moverVentana();
-			//}
+		public boolean CicloRevisarTimeOut(){
+			moverVentana();
 			//int r=pendientes;//calcVentanaPendientes();
 			String segmento="";
 			Frame a;
 			long time;
-			for(int i=0; i<pendientes; i++){
-				a=colaVentana.get(i);
-				time=TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
-				if((a.getTimeout()<time)&&(!a.getRecibido())){
-					//segmento=""; //---
-					segmento=Integer.toString(a.getIdFrame())+":"+a.getData();
-					enviarDatos(segmento);
-					a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
+			for(int i=0; i<colaVentana.size(); i++){
+				if(hayACKnuevo){
+					return false;
 				}
-	              
-	         }
+				else {
+					a=colaVentana.get(i);
+					time=TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
+					if((a.getTimeout()<time)&&(!a.getRecibido())){
+						segmento=Integer.toString(a.getIdFrame())+":"+a.getData();
+						enviarDatos(segmento);
+						a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
+					}
+		         }
+			}
+			return true;
 		}
 		
-		public  void enviarDatos(String datos)/*  throws IOException  */{//Hay que cambiarlo pero funciona temporalmente, creo
+		public  void enviarDatos(String datos) {//Hay que cambiarlo pero funciona temporalmente, creo
 			
 			System.out.println("Sending segment.");
 			out.println(datos);
@@ -272,9 +260,9 @@ public class Client {
 		
 		//{}
 		public  void hiloEnviaFrames(){
-			int pendientes=calcVentanaPendientes();
-	        while (pendientes!=0){
-	        	CicloRevisarTimeOut(pendientes);
+			//int pendientes=calcVentanaPendientes();
+	        while (colaPendientes.size()!=0){
+	        	CicloRevisarTimeOut();
 	        }
 		}
 
@@ -283,13 +271,20 @@ public class Client {
 			int ack=-1;
 			int index=0;
 			Frame a;
-	        while (calcVentanaPendientes()!=0){
+			String input="";
+	        while (colaPendientes.size()!=0){
 	        	//CicloRevisarTimeOut(pendientes);
 	        	try {
-					String input = in.readLine();
+	        		input="";
+	        		System.out.println("Before reading next ack.");
+	        		while (input.length()==0){
+	        			//in.readLine()
+	        			input = in.readLine();
+	        		}
+	        		System.out.println("After reading next ack.");
 					ack=Integer.parseInt(input);
 					index=ack-num1eroVentana;
-					if(index>0){
+					if(index>-1){
 						a=colaVentana.get(index);
 						if(a.getIdFrame()==ack){
 							a.setRecibido(true);
