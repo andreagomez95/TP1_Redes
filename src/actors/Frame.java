@@ -5,13 +5,13 @@ import java.util.Date;
 public class Frame
 {
 	//public static long infinito=Long.MAX_VALUE;
-	private static boolean recibido;
+	private boolean recibido;
 	
-	private static long timeout;
+	private long timeout;
 	
-	private static int idFrame;
+	private int idFrame;
 	
-	private static char data;
+	private char data;
 	
 	public Frame(int id, long time) 
 	{

@@ -173,6 +173,7 @@ public class Client {
 			for(int i=0; i<numElemPasar; i++){
 				a = colaPendientes.pop();//.pollFirst();
 				b=new Frame(a.getIdFrame(),inicializarTimeOut);
+				b.setData(a.getData());
 				System.out.print(b.getIdFrame()+": "+b.getData()+", ");
 				colaVentana.addLast(b);
 			}
@@ -202,7 +203,7 @@ public class Client {
 		}
 		
 		public  void mostrarPendientes(){
-			int j=colaVentana.size();
+			int j=colaPendientes.size();
 			System.out.println("Pendientes: ");
 			for(int i=0; i<j; i++){
 				System.out.print(colaPendientes.get(i).getIdFrame()+":"+colaPendientes.get(i).getData()+", ");
@@ -214,10 +215,17 @@ public class Client {
 		//{}
 		public  void moverVentana(){
 			Frame a;
+			Frame b;
 			while (colaVentana.getFirst().getRecibido()==true){
-				colaVentana.pop();
+				/*colaVentana.pop();
 				a = colaPendientes.pop();//.pop();
-				colaVentana.addLast(a);
+				a=new Frame()
+				colaVentana.addLast(a);*/
+				a = colaPendientes.pop();//.pollFirst();
+				b=new Frame(a.getIdFrame(),inicializarTimeOut);
+				b.setData(a.getData());
+				System.out.print(b.getIdFrame()+": "+b.getData()+", ");
+				colaVentana.addLast(b);
 				num1eroVentana=num1eroVentana+1;
 			}
 			mostrarVentana();
