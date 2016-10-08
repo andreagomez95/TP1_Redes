@@ -13,8 +13,6 @@ public class Frame
 	
 	private char data;
 	
-	private boolean head;
-	
 	public Frame(int id, long time) 
 	{
 		idFrame = id;

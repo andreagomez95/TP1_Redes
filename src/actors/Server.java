@@ -32,6 +32,8 @@ public class Server
 	
 	private static int port; //9093
 	
+	private static int ID = 0;
+	
 	private static String mode;
     /**
      * Runs the server.
@@ -48,6 +50,14 @@ public class Server
         
         ServerSocket listener = new ServerSocket(port);
         System.out.println("Starting server at " + listener.getInetAddress() + " in port " + port);
+        
+        for(int i = 0; i < windowSize; i++)
+        {
+        	Frame e = new Frame(ID,0);
+        	window.add(e);
+        	ID++;
+        }
+        
         
         
         try 
@@ -88,21 +98,25 @@ public class Server
                         int sec = Integer.parseInt(section);
                         char charac = character.charAt(0);
                         
-                        Frame newFrame = new Frame(sec,0);
-                        newFrame.setData(charac);
                         
                         System.out.println("Frame number " + section + " received by server.");
                         
-                        if(windowSize > window.size())
+                        Frame frame = checkIDs(sec);
+                        if(frame == null)
                         {
-                        	window.add(newFrame);																				
-                        	out.println("ACK:"+section);
+                        	//Si el ACK fue extraviado, enviar otro ACK 
+                        	out.println("ACK:"+sec);
                         }
                         else
                         {
-                        	
+                        	frame.setData(charac);
+                        	frame.setRecibido(true);
+                        	out.println("ACK:"+sec);
                         }
+                        moveWindow();
                         
+                        
+                        out.println("ACK:"+section);
                         System.out.println("Server sending ACK ID: " + section + " to client.");
                         
                         //TODO: send data to receivedQueue
@@ -133,11 +147,28 @@ public class Server
         }
     }
     
-    public static void moveWindow(Frame frame)
+    public static void moveWindow()
     {
+    	while(window.peek().getRecibido())
+        {
+    		Frame oldFrame = window.poll();
+    		Frame newFrame = new Frame(ID,0);
+        	window.add(newFrame);
+        	ID++;
+        }
     	
-    	window.poll();
-    	window.add(frame);
+    }
+    
+    public static Frame checkIDs(int id)
+    {
+    	for(Frame f : window)
+    	{
+    		if(f.getIdFrame() == id)
+    		{
+    			return f;
+    		}
+    	}
+    	return null;
     }
     
     public static void writeFile()
