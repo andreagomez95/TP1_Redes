@@ -275,6 +275,7 @@ public class Client {
 			out.println(datos);
 			out.flush();
 			System.out.println("Segment sent.");
+
 		}
 		
 		//{}
@@ -345,7 +346,7 @@ public class Client {
 		        			input = in.readLine();
 		        		
 			        		System.out.println("After reading next ack.");
-							ack=Integer.parseInt(input);
+							ack=ACKnumb(input);//Integer.parseInt(input);
 							index=ack-num1eroVentana;
 							if(index>-1){
 								a=colaVentana.get(index);
@@ -405,6 +406,15 @@ public class Client {
 	        }
 		}
 		
+		public int ACKnumb(String ack){
+			int trash=4;
+			String result="";
+			int numb=ack.length();
+			for(int e=trash;e<numb-4;++e){
+				result=result+ack.charAt(e);
+			}
+			return Integer.parseInt(result);
+		}
 		
 		
 		public static void main(String[] args) throws IOException {
