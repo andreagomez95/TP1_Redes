@@ -102,32 +102,25 @@ public class Server
                         System.out.println("Frame number " + section + " received by server.");
                         
                         Frame frame = checkIDs(sec);
-                        if(frame == null)
+                        //If the ID is not found, then it means that the previous ACK was lost
+                        
+                        if(frame != null)
                         {
-                        	//Si el ACK fue extraviado, enviar otro ACK 
-                        	out.println("ACK:"+sec);
-                        }
-                        else
-                        {
+                        	//If the ID is found, get the data to said frame and change its state to "received".
                         	frame.setData(charac);
                         	frame.setRecibido(true);
-                        	out.println("ACK:"+sec);
                         }
                         moveWindow();
                         
-                        
+                        //Either way, send an ACK for the section
                         out.println("ACK:"+section);
                         System.out.println("Server sending ACK ID: " + section + " to client.");
                         
-                        //TODO: send data to receivedQueue
-                        for(Frame f : window)
-                    	{
-                    		
-                    	}
                         
                     }
-
                     
+                    //After all the frames have been received, write the data into a new file
+                    writeFile();
                     
                 }catch (IOException e) 
                 {
@@ -153,12 +146,15 @@ public class Server
         {
     		Frame oldFrame = window.poll();
     		Frame newFrame = new Frame(ID,0);
+    		//Add an empty frame to the window
         	window.add(newFrame);
+        	//Add the old frame to the receivedQueue. 
+        	receivedQueue.add(oldFrame);
         	ID++;
         }
     	
     }
-    
+    //Checks if the given id of the received frame is found in the window
     public static Frame checkIDs(int id)
     {
     	for(Frame f : window)
