@@ -35,39 +35,42 @@ public class Server
 	private static int ID = 0;
 	
 	private static String mode;
+	
+	private static int sec;
+	
+	private static char charac;
     /**
      * Runs the server.
      */
     public static void main(String[] args) throws IOException 
     {
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Input window size: ");
-        windowSize = scan.nextInt();
-        System.out.println("Input port to connect to: ");
-        port = scan.nextInt();
-        System.out.println("Input mode of display: ");
-        mode = scan.nextLine();
+    	//Asks the user to input the necessary data for the program to run
+    	getInput();
         
         ServerSocket listener = new ServerSocket(port);
-        System.out.println("Starting server at " + listener.getInetAddress() + " in port " + port);
-        
-        for(int i = 0; i < windowSize; i++)
+        if(mode.equals("debug"))
         {
-        	Frame e = new Frame(ID,0);
-        	window.add(e);
-        	ID++;
+        	System.out.println("Starting server at " + listener.getInetAddress() + " in port " + port);
         }
         
-        
+        //Adds the initial empty frames to the window of the server
+        addEmptyFrames();
         
         try 
         {
-        	System.out.println("Server waiting to connect...");
-        	//TODO: change while condition to stop loop
-            while (true) 
+        	if(mode.equals("debug"))
+            {
+        		System.out.println("Server waiting to connect...");
+            }
+        	
+            if(true) 
             {
                 Socket clientSocket = listener.accept();
-                System.out.println("Server connected to " + clientSocket.getInetAddress());
+                if(mode.equals("debug"))
+                {
+                	System.out.println("Server connected to " + clientSocket.getInetAddress());
+                }
+                
                 try 
                 {
                 	//in will receive the frames from the client
@@ -84,22 +87,23 @@ public class Server
                         //If the there are no more packages to send, the client will send a "." to message EOF.
                         if (input == null || input.equals(".")) 
                         {
+                        	
+                        	if(mode.equals("debug"))
+                            {
+                        		System.out.println("EOF frame received.");
+                            }
                             break;
                         }
                         
                         //Splits the input string to separate the ID from the data in the frame
-                        String[] frameElements;
-                        String delimeter = ":";
-                        frameElements = input.split(delimeter);
-                        
-                        String section = frameElements[0];
-                        String character = frameElements[1];
-                        
-                        int sec = Integer.parseInt(section);
-                        char charac = character.charAt(0);
+                        splitFrameData(input);
                         
                         
-                        System.out.println("Frame number " + section + " received by server.");
+                        if(mode.equals("debug"))
+                        {
+                        	System.out.println("Frame number " + sec + " received by server.");
+                        }
+                        
                         
                         Frame frame = checkIDs(sec);
                         //If the ID is not found, then it means that the previous ACK was lost
@@ -107,15 +111,29 @@ public class Server
                         if(frame != null)
                         {
                         	//If the ID is found, get the data to said frame and change its state to "received".
+                        	if(mode.equals("debug"))
+                            {
+                        		System.out.println("Writing " + charac + " into frame " + sec + ".");
+                            }
                         	frame.setData(charac);
                         	frame.setRecibido(true);
+                        }
+                        else
+                        {
+                        	if(mode.equals("debug"))
+                            {
+                        		System.out.println("Frame ID not found.");
+                            }
                         }
                         moveWindow();
                         
                         //Either way, send an ACK for the section
-                        out.println("ACK:"+section);
-                        System.out.println("Server sending ACK ID: " + section + " to client.");
+                        out.println("ACK:"+sec);
                         
+                        if(mode.equals("debug"))
+                        {
+                        	System.out.println("Server sending ACK ID: " + sec + " to client.");
+                        }
                         
                     }
                     
@@ -135,9 +153,45 @@ public class Server
         }
         finally 
         {
-        	System.out.println("Server closing connection.");
+        	System.out.println("Server closing.");
             listener.close();
         }
+    }
+    
+    public static void splitFrameData(String input)
+    {
+    	String[] frameElements;
+        String delimeter = ":";
+        frameElements = input.split(delimeter);
+        
+        String section = frameElements[0];
+        String character = frameElements[1];
+        
+        sec = Integer.parseInt(section);
+        charac = character.charAt(0);
+    }
+    
+    public static void addEmptyFrames()
+    {
+    	//Adds the initial empty frames to the window
+        for(int i = 0; i < windowSize; i++)
+        {
+        	Frame e = new Frame(ID,0);
+        	window.add(e);
+        	ID++;
+        }
+    }
+    
+    public static void getInput()
+    {
+    	Scanner scan = new Scanner(System.in);
+        System.out.println("Input window size: ");
+        windowSize = scan.nextInt();
+        System.out.println("Input port to connect to: ");
+        port = scan.nextInt();
+        System.out.println("Input mode of display (normal or debug): ");
+        mode = scan.nextLine();
+        scan.close();
     }
     
     public static void moveWindow()
@@ -148,8 +202,16 @@ public class Server
     		Frame newFrame = new Frame(ID,0);
     		//Add an empty frame to the window
         	window.add(newFrame);
+        	if(mode.equals("debug"))
+            {
+        		System.out.println("Moving window one position.");
+            }
         	//Add the old frame to the receivedQueue. 
         	receivedQueue.add(oldFrame);
+        	if(mode.equals("debug"))
+            {
+        		System.out.println("Adding frame data " + oldFrame.getData() + " to receivedQueue.");
+            }
         	ID++;
         }
     	
@@ -169,7 +231,7 @@ public class Server
     
     public static void writeFile()
     {
-    	System.out.println("Beginning writing data to file...");
+    	System.out.println("Server beginning writing data to file...");
     	for(Frame f : receivedQueue)
     	{
     		try 
