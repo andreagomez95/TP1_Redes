@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.Date;
+//import java.net.UnknownHostException;
+//import java.util.Date;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
-import java.net.ServerSocket;
+//import java.net.ServerSocket;
 import java.util.Scanner;
-import javax.swing.JOptionPane;
+//import javax.swing.JOptionPane;
 
 /**
  * Trivial client for the date server.
@@ -61,15 +61,20 @@ public class Client {
 	        serverAddress = "localhost"; //Mejor mantenerlo en local host para que funcione bien.
 	        System.out.println("Client connecting to server at " + serverAddress + " in port "+port);
 	        serverSocket = new Socket(serverAddress, port);
+	        System.out.println("Client conneted to server");
 	        out = new PrintWriter(serverSocket.getOutputStream(), true);
 	        
 	        
 	        in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-	        
-	        hiloACK.start();
-	        hiloEnvia.start();
-	        
-	        
+	        System.out.println("About to start both threads");
+	        //hiloACK.start();
+	       /* hiloEnvia.run();
+	        System.out.println("Just after hiloEnvia.start()");
+	        hiloACK.run();
+	        System.out.println("Just after hiloACK.start()");
+	        //hiloEnvia.start();
+	        */
+	        hiloRecibeACKEnviaDatos();
 	        serverSocket.close();
 			
 			
@@ -77,6 +82,7 @@ public class Client {
 		
 		public  Thread hiloACK = new Thread () {
 			  public void run () {
+				  System.out.println("hiloRecibeACK() started");
 				  hiloRecibeACK();
 				  try {
 					this.finalize();
@@ -88,6 +94,7 @@ public class Client {
 		};
 		public  Thread hiloEnvia = new Thread () {
 			  public void run () {
+				  System.out.println("hiloEnviaFrames() started");
 				  hiloEnviaFrames();
 				  try {
 					  this.finalize();
@@ -131,7 +138,7 @@ public class Client {
 				
 				debugMode= true;
 				
-				timeOut = 10000;
+				timeOut = 10;
 			}
 			
 			scan.close();
@@ -145,12 +152,14 @@ public class Client {
 			mostrarVentana();
 			totalFrames=datos.length()-4;//////////////////////////////////Revisar esto
 			Frame a;
+			System.out.println("Datos en frames");
 			for(int i=0; i<totalFrames; i++){
 	              a = new Frame(i,inicializarTimeOut);
 	              char d=datos.charAt(i);
 	              a.setData(d);
 	              a.setIdFrame(i);
 	              colaPendientes.add(a);
+	              System.out.println("Frame "+a.getData()+" : "+a.getIdFrame());
 	         }
 			System.out.println("Sale crear frames: ");
 		}
@@ -214,24 +223,27 @@ public class Client {
 		public  void moverVentana(){
 			Frame a;
 			Frame b;
-			while ((colaPendientes.size()!=0)||(colaVentana.getFirst()!=null && colaVentana.getFirst().getRecibido()==true)){
+			while ((colaPendientes.size()!=0)&&(colaVentana.getFirst()!=null && colaVentana.getFirst().getRecibido()==true)){
 				a = colaPendientes.pop();
 				b=new Frame(a.getIdFrame(),inicializarTimeOut);
 				b.setData(a.getData());
 				System.out.print(b.getIdFrame()+": "+b.getData()+", ");
 				colaVentana.addLast(b);
 				num1eroVentana=num1eroVentana+1;
+				mostrarVentana();
 			}
 			while ((colaVentana.getFirst()!=null && colaVentana.getFirst().getRecibido()==true)){
 				a = colaPendientes.pop();
 				num1eroVentana=num1eroVentana+1;
+				mostrarVentana();
 			}
-			mostrarVentana();
+			
 		}
 		
 		
 		
 		public boolean CicloRevisarTimeOut(){
+			System.out.println("Revisar time out.");
 			moverVentana();
 			//int r=pendientes;//calcVentanaPendientes();
 			String segmento="";
@@ -245,6 +257,8 @@ public class Client {
 					a=colaVentana.get(i);
 					time=TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
 					if((a.getTimeout()<time)&&(!a.getRecibido())){
+						System.out.println("Vencio time out "+a.getIdFrame()+":"+a.getData());
+						//System.out.println("Enviando frame "+a.getIdFrame());
 						segmento=Integer.toString(a.getIdFrame())+":"+a.getData();
 						enviarDatos(segmento);
 						a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
@@ -257,6 +271,7 @@ public class Client {
 		public  void enviarDatos(String datos) {//Hay que cambiarlo pero funciona temporalmente, creo
 			
 			System.out.println("Sending segment.");
+			System.out.println("Enviando "+datos);
 			out.println(datos);
 			out.flush();
 			System.out.println("Segment sent.");
@@ -264,6 +279,7 @@ public class Client {
 		
 		//{}
 		public  void hiloEnviaFrames(){
+			System.out.println("Entro a hiloEnviaFrames");
 			//int pendientes=calcVentanaPendientes();
 	        while (colaPendientes.size()!=0||colaVentana.size()!=0){
 	        	CicloRevisarTimeOut();
@@ -271,6 +287,7 @@ public class Client {
 		}
 
 		public  void hiloRecibeACK(){
+			System.out.println("Entro a hiloRecibeACK");
 			//int pendientes=calcVentanaPendientes();
 			int ack=-1;
 			int index=0;
@@ -306,6 +323,89 @@ public class Client {
 	        	i=i+1;
 	        }
 		}
+		
+		
+		public boolean recibirDatos(){
+			//System.out.println("Entro a hiloRecibeACK");
+			//int pendientes=calcVentanaPendientes();
+			int ack=-1;
+			int index=0;
+			Frame a;
+			String input="";
+			int i=0;
+	        if (colaPendientes.size()!=0||colaVentana.size()!=0){
+	        	//System.out.println("While pendientes"+i);
+	        	//CicloRevisarTimeOut(pendientes);
+	        	try {
+		        		input="";
+		        		//System.out.println("Before reading next ack.");
+		        		//while (input.length()==0){
+		        		if (input.length()!=0){
+		        			//in.readLine()
+		        			input = in.readLine();
+		        		
+			        		System.out.println("After reading next ack.");
+							ack=Integer.parseInt(input);
+							index=ack-num1eroVentana;
+							if(index>-1){
+								a=colaVentana.get(index);
+								if(a.getIdFrame()==ack){
+									a.setRecibido(true);
+									hayACKnuevo=true;
+								}
+							}
+							return true;
+		        		} else {
+		        			//System.out.println("No leyo nada");
+		        			return false;
+		        		}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					System.out.println("Problema while recibeACK"+i);
+					e.printStackTrace();
+					System.out.println("Problema while recibeACK");
+				}
+	        	i=i+1;
+	        	return false;
+	        }
+	        return false;
+		}
+		public boolean CicloRevisarTimeOut2(){
+			//System.out.println("Revisar time out.");
+			moverVentana();
+			//int r=pendientes;//calcVentanaPendientes();
+			String segmento="";
+			Frame a;
+			long time;
+			for(int i=0; i<colaVentana.size(); i++){
+				if(recibirDatos()){
+					return false;
+				}
+				else {
+					a=colaVentana.get(i);
+					time=TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
+					if((a.getTimeout()<time)&&(!a.getRecibido())){
+						System.out.println("Vencio time out "+a.getIdFrame()+":"+a.getData());
+						//System.out.println("Enviando frame "+a.getIdFrame());
+						segmento=Integer.toString(a.getIdFrame())+":"+a.getData();
+						enviarDatos(segmento);
+						a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
+					}
+		         }
+			}
+			return true;
+		}
+		
+		
+		public void hiloRecibeACKEnviaDatos(){
+			System.out.println("Entro a hiloEnviaFrames");
+			//int pendientes=calcVentanaPendientes();
+	        while (colaPendientes.size()!=0||colaVentana.size()!=0){
+	        	CicloRevisarTimeOut2();
+	        }
+		}
+		
+		
 		
 		public static void main(String[] args) throws IOException {
 			Client cliente= new Client();
