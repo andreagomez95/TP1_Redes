@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Queue;
 import java.util.Scanner;
@@ -92,9 +93,24 @@ public class Server
                         
                         System.out.println("Frame number " + section + " received by server.");
                         
+                        if(windowSize > window.size())
+                        {
+                        	window.add(newFrame);																				
+                        	out.println("ACK:"+section);
+                        }
+                        else
+                        {
+                        	
+                        }
+                        
                         System.out.println("Server sending ACK ID: " + section + " to client.");
                         
-                        //out.println(input.toUpperCase());
+                        //TODO: send data to receivedQueue
+                        for(Frame f : window)
+                    	{
+                    		
+                    	}
+                        
                     }
 
                     
@@ -119,6 +135,7 @@ public class Server
     
     public static void moveWindow(Frame frame)
     {
+    	
     	window.poll();
     	window.add(frame);
     }
