@@ -224,12 +224,12 @@ public class Client {
 	        	try {
 		        		input="";
 
-		        		if (input.length()!=0){
+		        		if (in.ready()){
 
 		        			input = in.readLine();
 		        		
 			        		System.out.println("After reading next ack.");
-							ack=ACKnumb(input);//Integer.parseInt(input);
+							ack=ACKnumb(input);
 							index=ack-num1eroVentana;
 							if(index>-1){
 								a=colaVentana.get(index);
@@ -271,7 +271,7 @@ public class Client {
 					time=TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
 					if((a.getTimeout()<time)&&(!a.getRecibido())){
 						System.out.println("Vencio time out "+a.getIdFrame()+":"+a.getData());
-						//System.out.println("Enviando frame "+a.getIdFrame());
+
 						segmento=Integer.toString(a.getIdFrame())+":"+a.getData();
 						enviarDatos(segmento);
 						a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
