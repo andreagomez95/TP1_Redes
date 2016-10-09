@@ -102,7 +102,9 @@ public class Client {
 
 				windowSize = 4;
 
-				filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
+				//filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
+				
+				filePath = "C:/Users/USUARIO/git/TP1_Redes/datosTP1.txt";
 				
 				port = 9093;
 				

@@ -35,7 +35,7 @@ public class Server
 	
 	private int ID = 0;
 	
-	private String mode;
+	private boolean debug;
 	
 	private int sec;
 	
@@ -55,8 +55,9 @@ public class Server
     	//Asks the user to input the necessary data for the program to run
     	if(getInput())
     	{
+    		System.out.println("test1");
 	        ServerSocket listener = new ServerSocket(port);
-	        if(mode.equals("y"))
+	        if(debug)
 	        {
 	        	System.out.println("Starting server at " + listener.getInetAddress() + " in port " + port);
 	        }
@@ -66,7 +67,7 @@ public class Server
 	        
 	        try 
 	        {
-	        	if(mode.equals("y"))
+	        	if(debug)
 	            {
 	        		System.out.println("Server waiting to connect...");
 	            }
@@ -74,7 +75,7 @@ public class Server
 	            if(true) 
 	            {
 	                Socket clientSocket = listener.accept();
-	                if(mode.equals("y"))
+	                if(debug)
 	                {
 	                	System.out.println("Server connected to " + clientSocket.getInetAddress());
 	                }
@@ -96,7 +97,7 @@ public class Server
 	                        if (input == null || input.equals(".")) 
 	                        {
 	                        	
-	                        	if(mode.equals("y"))
+	                        	if(debug)
 	                            {
 	                        		System.out.println("EOF frame received.");
 	                            }
@@ -107,7 +108,7 @@ public class Server
 	                        splitFrameData(input);
 	                        
 	                        
-	                        if(mode.equals("y"))
+	                        if(debug)
 	                        {
 	                        	System.out.println("Frame number " + sec + " received by server.");
 	                        }
@@ -119,7 +120,7 @@ public class Server
 	                        if(frame != null)
 	                        {
 	                        	//If the ID is found, get the data to said frame and change its state to "received".
-	                        	if(mode.equals("y"))
+	                        	if(debug)
 	                            {
 	                        		System.out.println("Writing " + charac + " into frame " + sec + ".");
 	                            }
@@ -128,7 +129,7 @@ public class Server
 	                        }
 	                        else
 	                        {
-	                        	if(mode.equals("y"))
+	                        	if(debug)
 	                            {
 	                        		System.out.println("Frame ID not found.");
 	                            }
@@ -139,7 +140,7 @@ public class Server
 	                        out.println("ACK:"+sec);
 	                        //out.flush();
 	                        
-	                        if(mode.equals("y"))
+	                        if(debug)
 	                        {
 	                        	System.out.println("Server sending ACK ID: " + sec + " to client.");
 	                        }
@@ -196,14 +197,24 @@ public class Server
     {
     	Scanner scan = new Scanner(System.in);
         System.out.println("Input window size: ");
-        windowSize = scan.nextInt();
+        windowSize = Integer.parseInt(scan.nextLine());
         System.out.println("Input port to connect to: ");
-        port = scan.nextInt();
-        System.out.println("Input mode of display debug?(y/n): ");
-        mode = scan.nextLine();
-        scan.close();
+        port = Integer.parseInt(scan.nextLine());
+        System.out.println("Input debug of display debug?(y/n): ");
+        String mode = scan.nextLine();
         
-        if(windowSize != 0 && port != 0 && mode != null)
+        
+        if(mode.equalsIgnoreCase("y"))
+        {
+        	debug = true;
+        }
+        else
+        {
+        	debug = false;
+        }
+        
+        scan.close();
+        if(windowSize != 0 && port != 0)
         {
         	return true;
         }
@@ -218,13 +229,13 @@ public class Server
     		Frame newFrame = new Frame(ID,0);
     		//Add an empty frame to the window
         	window.add(newFrame);
-        	if(mode.equals("y"))
+        	if(debug)
             {
         		System.out.println("Moving window one position.");
             }
         	//Add the old frame to the receivedQueue. 
         	receivedQueue.add(oldFrame);
-        	if(mode.equals("y"))
+        	if(debug)
             {
         		System.out.println("Adding frame data " + oldFrame.getData() + " to receivedQueue.");
             }
