@@ -50,8 +50,8 @@ public class Client {
 		public  BufferedReader in; 
 		
 		public Client() throws IOException{
-			//setVariables(true);
-			setVariables(false);
+			setVariables(true);
+			//setVariables(false);
 			String datosEntrada = fh.readUsingBuffer(filePath);
 	        
 	        creandoEstrucNec(datosEntrada);
