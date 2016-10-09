@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
@@ -22,27 +23,34 @@ public class Server
 {
 
 	
-	private static FileHandler fileHandler = new FileHandler();
-	private static String filePath = "C:/Users/USUARIO/Documents/outputTP1.txt";
+	private FileHandler fileHandler = new FileHandler();
+	private String filePath = "C:/Users/USUARIO/Documents/outputTP1.txt";
 	
-	private static Queue<Frame> receivedQueue = new ArrayDeque<Frame>();
-	private static Queue<Frame> window = new ArrayDeque<Frame>();
+	private Queue<Frame> receivedQueue = new LinkedList<Frame>();
+	private Queue<Frame> window = new LinkedList<Frame>();
 	
-	private static int windowSize;
+	private int windowSize;
 	
-	private static int port; //9093
+	private int port; //9093
 	
-	private static int ID = 0;
+	private int ID = 0;
 	
-	private static String mode;
+	private String mode;
 	
-	private static int sec;
+	private int sec;
 	
-	private static char charac;
+	private char charac;
     /**
      * Runs the server.
      */
     public static void main(String[] args) throws IOException 
+    {
+    	Server server = new Server();
+    	
+    	System.exit(0);
+    }
+    
+    public Server() throws IOException 
     {
     	//Asks the user to input the necessary data for the program to run
     	getInput();
@@ -129,6 +137,7 @@ public class Server
                         
                         //Either way, send an ACK for the section
                         out.println("ACK:"+sec);
+                        //out.flush();
                         
                         if(mode.equals("debug"))
                         {
@@ -158,7 +167,7 @@ public class Server
         }
     }
     
-    public static void splitFrameData(String input)
+    public void splitFrameData(String input)
     {
     	String[] frameElements;
         String delimeter = ":";
@@ -171,7 +180,7 @@ public class Server
         charac = character.charAt(0);
     }
     
-    public static void addEmptyFrames()
+    public void addEmptyFrames()
     {
     	//Adds the initial empty frames to the window
         for(int i = 0; i < windowSize; i++)
@@ -182,19 +191,19 @@ public class Server
         }
     }
     
-    public static void getInput()
+    public void getInput()
     {
     	Scanner scan = new Scanner(System.in);
         System.out.println("Input window size: ");
         windowSize = scan.nextInt();
         System.out.println("Input port to connect to: ");
         port = scan.nextInt();
-        System.out.println("Input mode of display (normal or debug): ");
+        System.out.println("Input mode of display debug?(y/n): ");
         mode = scan.nextLine();
         scan.close();
     }
     
-    public static void moveWindow()
+    public void moveWindow()
     {
     	while(window.peek().getRecibido())
         {
@@ -217,7 +226,7 @@ public class Server
     	
     }
     //Checks if the given id of the received frame is found in the window
-    public static Frame checkIDs(int id)
+    public Frame checkIDs(int id)
     {
     	for(Frame f : window)
     	{
@@ -229,7 +238,7 @@ public class Server
     	return null;
     }
     
-    public static void writeFile()
+    public void writeFile()
     {
     	System.out.println("Server beginning writing data to file...");
     	for(Frame f : receivedQueue)
