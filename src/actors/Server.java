@@ -55,7 +55,6 @@ public class Server
     	//Asks the user to input the necessary data for the program to run
     	if(getInput())
     	{
-    		System.out.println("test1");
 	        ServerSocket listener = new ServerSocket(port);
 	        if(debug)
 	        {
@@ -88,10 +87,11 @@ public class Server
 	                	//out will send the acknowledges to the client
 	                    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 	                    
+	                    String input = " ";
 	                    //The main loop of the server that receives the frames from the client and returns acknowledges to it.
 	                    while (true) 
 	                    {
-	                        String input = in.readLine();
+	                        input = in.readLine();
 	                        
 	                        //If the there are no more packages to send, the client will send a "." to message EOF.
 	                        if (input == null || input.equals(".")) 

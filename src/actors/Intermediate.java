@@ -1,25 +1,106 @@
 package actors;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Scanner;
+
 public class Intermediate extends Thread
 {
 
 	   private Thread t;
+	   
 	   private String threadName;
+	   
+	   private static int portServer;
+	   
+	   private static int portClient;
+	   
+	   private static int p;
+	   
+	   private static boolean debug;
 	
-	   public static void main(String args[]) 
+	   public static void main(String args[])  throws IOException
 	   {
-		  Intermediate T1 = new Intermediate( "Thread-server-client");
+		  getInput();
+		  Intermediate T1 = new Intermediate( "Thread-ServerLink");
 	      T1.start();
 	      
-	      Intermediate T2 = new Intermediate( "Thread-client-server");
+	      Intermediate T2 = new Intermediate( "Thread-ClientLink");
 	      T2.start();
 	   }   
 	   
 	     
-	   Intermediate(String name)
+	   Intermediate(String name)  throws IOException
 	   {
 	      threadName = name;
-	      System.out.println("Creating " +  threadName );
+	      System.out.println("Creating " +  threadName + ".");
+	   }
+	   
+	   public void runIntermediate()   throws IOException
+	   {
+		 
+	    	if(threadName.equals("Thread-ServerLink"))
+	    	{
+		        
+	    	}
+	    	else
+	    	{
+	    		ServerSocket clientConnection = new ServerSocket(portServer);
+		        if(debug)
+		        {
+		        	System.out.println("Starting intermediate server connection at " + clientConnection.getInetAddress() + " in port " + portServer);
+		        }
+		        try 
+		        {
+		        	if(debug)
+		            {
+		        		System.out.println("Intermediate server waiting to connect...");
+		            }
+		        	
+		            if(true) 
+		            {
+		                Socket clientSocket = clientConnection.accept();
+		                if(debug)
+		                {
+		                	System.out.println("Intermediate server connected to " + clientSocket.getInetAddress());
+		                }
+		                
+		                try 
+		                {
+		                	//in will receive the frames from the client
+		                	BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		
+		                	//out will send the acknowledges to the client
+		                    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+		                    
+		                    String input = " ";
+		                    //The main loop of the server that receives the frames from the client and returns acknowledges to it.
+		                    while (true) 
+		                    {
+		                        input = in.readLine();
+		                    }
+		                }
+		                catch (IOException e) 
+		                {
+		                	System.out.println("Error handling client : " + e);
+		                }    
+		                finally 
+		                {
+		                	System.out.println("Intermediate closing its connection to client.");
+		                	clientSocket.close();
+		                }
+		            }
+		        }
+		        finally 
+		        {
+		        	System.out.println("Intermediate closing.");
+		        	clientConnection.close();
+		        }
+	    	}
 	   }
 	   
 	   public void run() 
@@ -27,12 +108,13 @@ public class Intermediate extends Thread
 	      System.out.println("Running " +  threadName );
 	      try 
 	      {
-	         for(int i = 4; i > 0; i--) 
-	         {
-	            System.out.println("Thread: " + threadName + ", " + i);
-	            // Let the thread sleep for a while.
-	            Thread.sleep(50);
-	         }
+	         try {
+				runIntermediate();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	         Thread.sleep(50);
 	      }catch (InterruptedException e) 
 	      {
 	         System.out.println("Thread " +  threadName + " interrupted.");
@@ -49,4 +131,29 @@ public class Intermediate extends Thread
 	         t.start ();
 	      }
 	   }
+	   
+	   public static void getInput()
+	    {
+	    	Scanner scan = new Scanner(System.in);
+	        System.out.println("Input the port to connect to the server: ");
+	        portServer = Integer.parseInt(scan.nextLine());
+	        System.out.println("Input the port to connect to the client: ");
+	        portClient = Integer.parseInt(scan.nextLine());
+	        System.out.println("Input the probability p of missing frames: ");
+	        p = Integer.parseInt(scan.nextLine());
+	        System.out.println("Input debug of display debug?(y/n): ");
+	        String mode = scan.nextLine();
+	        
+	        
+	        if(mode.equalsIgnoreCase("y"))
+	        {
+	        	debug = true;
+	        }
+	        else
+	        {
+	        	debug = false;
+	        }
+	        
+	        scan.close();
+	    }
 }
