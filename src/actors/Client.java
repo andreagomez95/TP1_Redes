@@ -162,21 +162,28 @@ public class Client {
 		
 		public  void mostrarVentana(){
 			int j=colaVentana.size();
-			
-			System.out.println("Ventana: ");
-			for(int i=0; i<j; i++){
-				System.out.print(colaVentana.get(i).getIdFrame()+":"+colaVentana.get(i).getData()+", ");
+			if(j>0){
+				System.out.println("Ventana: ");
+				for(int i=0; i<j; i++){
+					System.out.print(colaVentana.get(i).getIdFrame()+":"+colaVentana.get(i).getData()+", ");
+				}
+				System.out.println( " ");
+			} else {
+				System.out.print("Ventana vacia");
 			}
-			System.out.println( " ");
 		}
 		
 		public  void mostrarPendientes(){
 			int j=colaPendientes.size();
-			System.out.println("Pendientes: ");
-			for(int i=0; i<j; i++){
-				System.out.print(colaPendientes.get(i).getIdFrame()+":"+colaPendientes.get(i).getData()+", ");
+			if(j>0){
+				System.out.println("Pendientes: ");
+				for(int i=0; i<j; i++){
+					System.out.print(colaPendientes.get(i).getIdFrame()+":"+colaPendientes.get(i).getData()+", ");
+				}
+				System.out.println( " ");
+			} else {
+				System.out.print("Cola Pendientes vacia");
 			}
-			System.out.println( " ");
 		}
 		
 		
@@ -184,19 +191,22 @@ public class Client {
 		public  void moverVentana(){
 			Frame a;
 			Frame b;
-			while ((colaPendientes.size()!=0)&&(colaVentana.getFirst()!=null && colaVentana.getFirst().getRecibido()==true)){
-				a = colaPendientes.pop();
-				b=new Frame(a.getIdFrame(),inicializarTimeOut);
-				b.setData(a.getData());
-				System.out.print(b.getIdFrame()+": "+b.getData()+", ");
-				colaVentana.addLast(b);
-				num1eroVentana=num1eroVentana+1;
-				mostrarVentana();
-			}
-			while ((colaVentana.getFirst()!=null && colaVentana.getFirst().getRecibido()==true)){
-				a = colaVentana.pop();
-				num1eroVentana=num1eroVentana+1;
-				mostrarVentana();
+			if(colaVentana.size()>0){
+				while ((colaPendientes.size()!=0)&&(colaVentana.getFirst()!=null) && (colaVentana.getFirst().getRecibido()==true)){
+					colaVentana.pop();
+					a = colaPendientes.pop();
+					b=new Frame(a.getIdFrame(),inicializarTimeOut);
+					b.setData(a.getData());
+					System.out.print(b.getIdFrame()+": "+b.getData()+", ");
+					colaVentana.addLast(b);
+					num1eroVentana=num1eroVentana+1;
+					mostrarVentana();
+				}
+				while ((colaVentana.getFirst()!=null && colaVentana.getFirst().getRecibido()==true)){
+					a = colaVentana.pop();
+					num1eroVentana=num1eroVentana+1;
+					mostrarVentana();
+				}
 			}
 			
 		}
@@ -233,11 +243,22 @@ public class Client {
 							ack=ACKnumb(input);
 							index=ack-num1eroVentana;
 							if(index>-1){
-								a=colaVentana.get(index);
-								if(a.getIdFrame()==ack){
-									a.setRecibido(true);
-									hayACKnuevo=true;
+								a=colaVentana.getFirst();
+								int q=a.getIdFrame();
+								index=ack-q;
+								/*if (q<ack){
+									
 								}
+								else */
+								if (index>=0){
+									a=colaVentana.get(index);
+									if(a.getIdFrame()==ack){
+										a.setRecibido(true);
+										hayACKnuevo=true;
+									}
+								}
+								//else if (q==ack){}
+								
 							}
 							return true;
 		        		} else {
@@ -276,6 +297,8 @@ public class Client {
 						segmento=Integer.toString(a.getIdFrame())+":"+a.getData();
 						enviarDatos(segmento);
 						a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
+						mostrarPendientes();
+						mostrarVentana();
 					}
 		         }
 			}
