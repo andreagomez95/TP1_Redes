@@ -193,7 +193,7 @@ public class Client {
 				mostrarVentana();
 			}
 			while ((colaVentana.getFirst()!=null && colaVentana.getFirst().getRecibido()==true)){
-				a = colaPendientes.pop();
+				a = colaVentana.pop();
 				num1eroVentana=num1eroVentana+1;
 				mostrarVentana();
 			}
@@ -292,11 +292,13 @@ public class Client {
 		
 		public int ACKnumb(String ack){
 			int trash=4;
+			System.out.println("ACK que entro: "+ack);
 			String result="";
 			int numb=ack.length();
-			for(int e=trash;e<numb-4;e++){
+			for(int e=trash;e<numb;++e){
 				result=result+ack.charAt(e);
 			}
+			System.out.println("Despues del for "+result );
 			return Integer.parseInt(result);
 		}
 		
