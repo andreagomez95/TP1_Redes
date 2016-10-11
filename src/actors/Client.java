@@ -104,7 +104,7 @@ public class Client {
 
 				//filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
 				
-				filePath = "C:/Users/USUARIO/git/TP1_Redes/datosTP1.txt";
+				filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";//"C:/Users/USUARIO/git/TP1_Redes/datosTP1.txt";
 				
 				port = 9093;
 				
@@ -189,7 +189,7 @@ public class Client {
 		}
 		
 		
-		//{}
+	/*	//{}
 		public  void moverVentana(){
 			Frame a;
 			Frame b;
@@ -211,8 +211,35 @@ public class Client {
 				}
 			}
 			
-		}
-		
+		}*/
+		//{}
+				public  void moverVentana(){
+					Frame a;
+					Frame b;
+					if(colaVentana.size()>0){
+						while ((colaPendientes.size()!=0)&&(colaVentana.getFirst()!=null) && (colaVentana.getFirst().getRecibido()==true)){
+							colaVentana.pop();
+							a = colaPendientes.pop();
+							b=new Frame(a.getIdFrame(),inicializarTimeOut);
+							b.setData(a.getData());
+							System.out.print(b.getIdFrame()+": "+b.getData()+", ");
+							colaVentana.addLast(b);
+							num1eroVentana=num1eroVentana+1;
+							mostrarVentana();
+						}
+						//while ((num1eroVentana!=totalFrames)&&(colaVentana.getFirst()!=null && colaVentana.getFirst().getRecibido()==true)){
+						while (colaVentana.size()!=0){
+							if(colaVentana.getFirst().getRecibido()==true){
+								a = colaVentana.pop();
+								num1eroVentana=num1eroVentana+1;
+								mostrarVentana();
+							}else {
+								break;
+							}
+						}
+					}
+					
+				}
 		
 		public  void enviarDatos(String datos) {//Hay que cambiarlo pero funciona temporalmente, creo
 			
