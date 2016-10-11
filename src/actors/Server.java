@@ -266,7 +266,6 @@ public class Server
     	for(int i=0; i<totalFrames; i++){
     		a=receivedQueue.poll();
     		t=t+a.getData();
-            System.out.println("Datos recibidos: "+t);
        }
     	/*for(Frame f : receivedQueue)
     	{*/
