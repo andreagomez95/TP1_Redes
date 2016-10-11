@@ -24,7 +24,7 @@ public class Server
 
 	
 	private FileHandler fileHandler = new FileHandler();
-	private String filePath = "C:/Users/USUARIO/Documents/outputTP1.txt";
+	private String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/outputTP1.txt";
 	
 	private Queue<Frame> receivedQueue = new LinkedList<Frame>();
 	private Queue<Frame> window = new LinkedList<Frame>();
@@ -148,7 +148,7 @@ public class Server
 	                    }
 	                    
 	                    //After all the frames have been received, write the data into a new file
-	                    writeFile();
+	                    //writeFile();
 	                    
 	                }catch (IOException e) 
 	                {
@@ -165,6 +165,7 @@ public class Server
 	        {
 	        	System.out.println("Server closing.");
 	            listener.close();
+	            writeFile();
 	        }
     	}
     }
@@ -259,16 +260,24 @@ public class Server
     public void writeFile()
     {
     	System.out.println("Server beginning writing data to file...");
-    	for(Frame f : receivedQueue)
-    	{
+    	Frame a;
+    	String t="";
+    	int totalFrames=receivedQueue.size();
+    	for(int i=0; i<totalFrames; i++){
+    		a=receivedQueue.poll();
+    		t=t+a.getData();
+            System.out.println("Datos recibidos: "+t);
+       }
+    	/*for(Frame f : receivedQueue)
+    	{*/
     		try 
     		{
-				fileHandler.writeUsingBuffer(Character.toString(f.getData()), filePath);
+				fileHandler.writeUsingBuffer(t, filePath);
 			} catch (IOException e) 
     		{
 				e.printStackTrace();
 			}
-    	}
+    //	}
     	System.out.println("All data written to file successfully.");
     }
 }
