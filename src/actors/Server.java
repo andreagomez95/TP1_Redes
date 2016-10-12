@@ -25,8 +25,8 @@ public class Server
 	
 	private FileHandler fileHandler = new FileHandler();
 	
-	//private String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/outputTP1.txt";
-	private String filePath = "C:/Users/USUARIO/git/TP1_Redes/outputTP1.txt";
+	private String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/outputTP1.txt";
+	//private String filePath = "C:/Users/USUARIO/git/TP1_Redes/outputTP1.txt";
 	
 	private Queue<Frame> receivedQueue = new LinkedList<Frame>();
 	
@@ -173,7 +173,7 @@ public class Server
     	}
     }
     
-    public void splitFrameData(String input)
+    public void splitFrameData(String input)//Para separar los datos del numero de frame
     {
     	String[] frameElements;
         String delimeter = ":";
@@ -186,7 +186,7 @@ public class Server
         charac = character.charAt(0);
     }
     
-    public void addEmptyFrames()
+    public void addEmptyFrames()//Añadir frames vacios
     {
     	//Adds the initial empty frames to the window
         for(int i = 0; i < windowSize; i++)
@@ -197,7 +197,7 @@ public class Server
         }
     }
     
-    public boolean getInput()
+    public boolean getInput()//Obtener del usuario el modo en el que se va a correr el programa.
     {
     	Scanner scan = new Scanner(System.in);
         System.out.println("Input window size: ");
@@ -225,7 +225,7 @@ public class Server
         return false;
     }
     
-    public void moveWindow()
+    public void moveWindow()//Correr la ventana
     {
     	while(window.peek().getRecibido())
         {
@@ -248,7 +248,7 @@ public class Server
     	
     }
     //Checks if the given id of the received frame is found in the window
-    public Frame checkIDs(int id)
+    public Frame checkIDs(int id)//Revisar los id de los frames
     {
     	for(Frame f : window)
     	{
@@ -260,7 +260,7 @@ public class Server
     	return null;
     }
     
-    public void writeFile()
+    public void writeFile()//Escribir en el archivo
     {
     	System.out.println("Server beginning writing data to file...");
     	Frame a;

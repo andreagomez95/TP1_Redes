@@ -24,15 +24,46 @@ public class Intermediate extends Thread
 	   
 	   private static boolean debug;
 	   
-	   private PrintWriter out;
+	   private  static PrintWriter outServer;//Es lo que viene del servidor y va hacia el cliente
 	   
-	   private BufferedReader in;
+	   private  static BufferedReader inServer;//Es lo que entra al servidor desde el cliente
 	   
-	   String serverAddress = "localhost"; //Mejor mantenerlo en local host para que funcione bien.
+	   private  static PrintWriter outClient;//Es lo que viene del cliente y va hacia el servidor
+	   
+	   private  static BufferedReader inClient;//Es lo que entra al cliente desde el servidor
+	   
+	   static String serverAddress = "localhost"; //Mejor mantenerlo en local host para que funcione bien.
+	   public  String serverAddress1="";
+		
+		public static Socket serverSocket;
+		public static ServerSocket listener;
+		public static Socket clientSocket;
+
+	   
+	   
+	   
 	
 	   public static void main(String args[])  throws IOException
 	   {
-		  getInput();
+		   getInput();
+		   
+		   serverSocket = new Socket(serverAddress, portServer);//Para conectarse con el servidor
+		      listener = new ServerSocket(portClient);
+		      
+		      
+	          //Lo que sale del servidor hacia el cliente
+		        
+		        
+		        
+		   System.out.println("Hasta aqui llegp");
+		   clientSocket = listener.accept();
+           outClient = new PrintWriter(clientSocket.getOutputStream(), true);
+	          //Lo que sale del cliente hacia el servidor
+           inServer = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));//
+	      	//Lo que le entra al servidor desde el cliente
+           inClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		      //Lo que le entra al cliente desde el server
+	          outServer = new PrintWriter(serverSocket.getOutputStream(), true);
 		  Intermediate T1 = new Intermediate( "Thread-ServerLink");
 	      T1.start();
 	      
@@ -40,7 +71,170 @@ public class Intermediate extends Thread
 	      T2.start();
 	   }   
 	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   public void clienteAServidor() throws IOException
+	   {
+		 //Asks the user to input the necessary data for the program to run
+
+		   /*
+		    * Recibe el input del cliente y lo envia al servidor.
+		    * Deberia tomar las cosas del inClient creado con la direccion del cliente
+		    * y enviarlo al out con la direccion de modo que le llegue al servidor.
+		    * 
+		    * 
+		    * */
+		   		//ServerSocket listener = new ServerSocket(portClient);//Recibe cosas del cliente, escucha el puerto del cliente
+		        if(debug)
+		        {
+		        	System.out.println("Starting server at " + listener.getInetAddress() + " in port " + portClient);
+		        }
+		        
+		        //Adds the initial empty frames to the window of the server
+		        try 
+		        {
+		        	if(debug)
+		            {
+		        		System.out.println("Intermediate waiting to connect...");
+		            }
+		        	
+		            if(true) 
+		            {
+		            	/*
+		                clientSocket = listener.accept();
+		                outClient = new PrintWriter(clientSocket.getOutputStream(), true);
+		  	          //Lo que sale del cliente hacia el servidor
+		                inServer = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));//
+		    	      	//Lo que le entra al servidor desde el cliente
+		                inClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		  		      //Lo que le entra al cliente desde el server
+		  	          outServer = new PrintWriter(serverSocket.getOutputStream(), true);
+		  	          */
+		                //Acepta la conexion con el cliente (por eso usa el listener creado con la direccion del cliente)
+		                if(debug)
+		                {
+		                	System.out.println("Intermediate connected to " + clientSocket.getInetAddress());
+		                }
+		                
+		                try 
+		                { 
+		                    String input = " ";
+		                    //The main loop of the server that receives the frames from the client and returns acknowledges to it.
+		                    while (true) 
+		                    {
+		                        input = inServer.readLine();//Lo que le deberia entrar al servidor
+		                        System.out.println("Servidor recibio " + input);
+		                        //If the there are no more packages to send, the client will send a "." to message EOF.
+		                        if (input == null || input.equals(".")) 
+		                        {
+		                        	
+		                        	if(debug)
+		                            {
+		                        		System.out.println("EOF frame received.");
+		                            }
+		                            break;
+		                        }
+
+		                        if(debug)
+		                        {
+		                        	//System.out.println("Frame number " + sec + " received by server.");
+		                        }
+		                        if(!isMissing()){
+			                        outClient.println(input);
+			                        outClient.flush();
+		                        }
+		                        if(debug)
+		                        {
+		                        	System.out.println("Sending: " + input + "from client to server.");
+		                        }
+		                        
+		                    }
+		                }catch (IOException e) 
+		                {
+		                	System.out.println("Error handling client : " + e);
+		                }    
+		                finally 
+		                {
+		                	System.out.println("Server closing connection to client.");
+		                	clientSocket.close();
+		                }
+		            }
+		        }
+		        finally 
+		        {
+		        	System.out.println("Server closing.");
+		            listener.close();
+		        }
+	    	
+	    
+	   }
 	     
+	   
+	   public void servidorACliente() throws IOException
+	   {
+		 //Asks the user to input the necessary data for the program to run
+
+		   /*
+		    * Recibe el input del servidor y lo envia al cliente.
+		    * Deberia tomar las cosas del inServer creado con la direccion del servidor
+		    * y enviarlo al out con la direccion de modo que le llegue al cliente.
+		    * 
+		    * 
+		    * */
+		   	try {
+					String input="";
+					int i=0;
+					while (true) 
+	                {
+	                    input = inClient.readLine();//Lo que le deberia entrar al servidor
+	                    System.out.println("Servidor recibio " + input);
+	                    //If the there are no more packages to send, the client will send a "." to message EOF.
+	                    if (input == null || input.equals(".")) 
+	                    {
+	                    	
+	                    	if(debug)
+	                        {
+	                    		System.out.println("EOF frame received.");
+	                        }
+	                        break;
+	                    }
+	
+	                    if(debug)
+	                    {
+	                    	//System.out.println("Frame number " + sec + " received by server.");
+	                    }
+	                    if(!isMissing()){
+				            outServer.println(input);
+		                    outServer.flush();
+		                }
+	                    
+	                    if(debug)
+	                    {
+	                    	System.out.println("Sending: " + input + "from server to client.");
+	                    }
+	                    
+	                }
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				//System.out.println("Problema while recibeACK"+i);
+				e.printStackTrace();
+				//System.out.println("Problema while recibeACK");
+			}
+			
+	    
+	   }
+	   
+	   
+	   
+	   
+	   
+	   
 	   Intermediate(String name)  throws IOException
 	   {
 	      threadName = name;
@@ -52,6 +246,8 @@ public class Intermediate extends Thread
 		 
 	    	if(threadName.equals("Thread-ServerLink"))
 	    	{
+	    		clienteAServidor();
+	    		/*
 	    		if(debug)
 	            {
 	    			System.out.println("Intermediate client connecting to server at " + serverAddress + " in port " + portServer);
@@ -71,12 +267,12 @@ public class Intermediate extends Thread
 	            }
 		        
 		        //out will send the ACKs to the client
-		        out = new PrintWriter(clientSocket.getOutputStream(), true);
+		        outServer = new PrintWriter(clientSocket.getOutputStream(), true);
 		        
 		        //in will receive the ACKs from the server
-		        in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+		        inServer = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 
-		        String input = in.readLine();
+		        String input = inServer.readLine();
                 if(debug)
                 {
                 	System.out.println("Acknowledge " + input + " received from server.");
@@ -95,12 +291,14 @@ public class Intermediate extends Thread
 	                {
 	                	System.out.println("Sending Acknowledge " + input + " to server.");
 	                }
-                	out.println(input);
-                }
+                	outServer.println(input);
+                }*/
 	    	}
 	    	else
 	    	{
-	    		ServerSocket clientConnection = new ServerSocket(portClient);
+	    		/*
+	    		 ServerSocket clientConnection = new ServerSocket(portClient);
+	    		 
 		        if(debug)
 		        {
 		        	System.out.println("Starting intermediate server connection at " + clientConnection.getInetAddress() + " in port " + portClient);
@@ -130,16 +328,16 @@ public class Intermediate extends Thread
 		                try 
 		                {
 		                	//in will receive the frames from the client
-		                	in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		                	inClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		
 		                	//out will send the frames to the server
-		                    out = new PrintWriter(serverSocket.getOutputStream(), true);
+		                    outClient = new PrintWriter(serverSocket.getOutputStream(), true);
 		                    
 		                    String input = " ";
 		                    //The main loop of the server that receives the frames from the client and returns acknowledges to it.
 		                    while (true) 
 		                    {
-		                        input = in.readLine();
+		                        input = inClient.readLine();
 		                        if(debug)
 	    		                {
 	    		                	System.out.println("Packet " + input + " received from client.");
@@ -158,7 +356,7 @@ public class Intermediate extends Thread
 		    		                {
 		    		                	System.out.println("Sending packet " + input + " to server.");
 		    		                }
-		                        	out.println(input);
+		                        	outClient.println(input);
 		                        }
 		                    }
 		                }
@@ -177,7 +375,8 @@ public class Intermediate extends Thread
 		        {
 		        	System.out.println("Intermediate closing.");
 		        	clientConnection.close();
-		        }
+		        }*/
+	    		servidorACliente();
 	    	}
 	   }
 	   
