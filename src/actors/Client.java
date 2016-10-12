@@ -23,11 +23,16 @@ import java.util.Scanner;
 
 
 public class Client {
+	
 		//Variables globales
 		public  boolean hayACKnuevo=false;
+		
 		public  boolean debugMode=false;
+		
 		public  FileHandler fh = new FileHandler();
-		public  String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
+		
+		//public  String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
+		private String filePath = "C:/Users/USUARIO/git/TP1_Redes/datosTP1.txt";
 		
 		private  PrintWriter out;// = new PrintWriter(clientSocket.getOutputStream(), true);
 		
@@ -104,7 +109,7 @@ public class Client {
 
 				//filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
 				
-				filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";//"C:/Users/USUARIO/git/TP1_Redes/datosTP1.txt";
+				//filePath = "C:/Users/USUARIO/git/TP1_Redes/datosTP1.txt";
 				
 				port = 9093;
 				

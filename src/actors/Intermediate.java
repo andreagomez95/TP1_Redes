@@ -27,6 +27,8 @@ public class Intermediate extends Thread
 	   private PrintWriter out;
 	   
 	   private BufferedReader in;
+	   
+	   String serverAddress = "localhost"; //Mejor mantenerlo en local host para que funcione bien.
 	
 	   public static void main(String args[])  throws IOException
 	   {
@@ -50,20 +52,26 @@ public class Intermediate extends Thread
 		 
 	    	if(threadName.equals("Thread-ServerLink"))
 	    	{
-	    		String serverAddress = "localhost"; //Mejor mantenerlo en local host para que funcione bien.
 	    		if(debug)
 	            {
 	    			System.out.println("Intermediate client connecting to server at " + serverAddress + " in port " + portServer);
 	            }
 		        
 		        Socket serverSocket = new Socket(serverAddress, portServer);
+		        
+		        if(debug)
+	            {
+	    			System.out.println("Intermediate client connecting to client at " + serverAddress + " in port " + portClient);
+	            }
+		        
+		        Socket clientSocket = new Socket(serverAddress, portClient);
 		        if(debug)
 	            {
 		        	System.out.println("Intermediate client connected to server");
 	            }
 		        
 		        //out will send the ACKs to the client
-		        out = new PrintWriter(serverSocket.getOutputStream(), true);
+		        out = new PrintWriter(clientSocket.getOutputStream(), true);
 		        
 		        //in will receive the ACKs from the server
 		        in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
@@ -112,13 +120,20 @@ public class Intermediate extends Thread
 		                	System.out.println("Intermediate server connected to " + clientSocket.getInetAddress());
 		                }
 		                
+		                Socket serverSocket = new Socket(serverAddress, portServer);
+		                
+		                if(debug)
+		                {
+		                	System.out.println("Intermediate server connected to " + serverSocket.getInetAddress());
+		                }
+		                
 		                try 
 		                {
 		                	//in will receive the frames from the client
 		                	in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		
 		                	//out will send the frames to the server
-		                    out = new PrintWriter(clientSocket.getOutputStream(), true);
+		                    out = new PrintWriter(serverSocket.getOutputStream(), true);
 		                    
 		                    String input = " ";
 		                    //The main loop of the server that receives the frames from the client and returns acknowledges to it.
