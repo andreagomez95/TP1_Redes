@@ -55,7 +55,10 @@ public class Intermediate extends Thread
 		        
 		        
 		        
-		   System.out.println("Hasta aqui llegp");
+		      if(debug)
+	            {
+	        		System.out.println("Intermediate waiting to connect...");
+	            }
 		   clientSocket = listener.accept();
            outClient = new PrintWriter(clientSocket.getOutputStream(), true);
 	          //Lo que sale del cliente hacia el servidor
@@ -98,10 +101,7 @@ public class Intermediate extends Thread
 		        //Adds the initial empty frames to the window of the server
 		        try 
 		        {
-		        	if(debug)
-		            {
-		        		System.out.println("Intermediate waiting to connect...");
-		            }
+		        	
 		        	
 		            if(true) 
 		            {
@@ -119,14 +119,14 @@ public class Intermediate extends Thread
 		                    while (true) 
 		                    {
 		                        input = inServer.readLine();//Lo que le deberia entrar al servidor
-		                        System.out.println("Servidor recibio " + input);
+		                        //System.out.println("Servidor recibio " + input);
 		                        //If the there are no more packages to send, the client will send a "." to message EOF.
-		                        if (input == null || ( input.compareTo(".")==0) )
+		                        if (input == null || ( input.equals(".")) )
 		                        {
 		                        	
 		                        	if(debug)
 		                            {
-		                        		System.out.println("EOF frame received.");
+		                        		System.out.println("EOF frame received for Thread-ServerLink.");
 		                            }
 		                            break;
 		                        }
@@ -147,28 +147,28 @@ public class Intermediate extends Thread
 		                    }
 		                }catch (IOException e) 
 		                {
-		                	//System.out.println("Error handling client : " + e);
+		                	System.out.println("Error handling client : " + e);
 		                }    
 		                finally 
 		                {
-		                	
+		                	if(debug)
+	                        {
+		                		System.out.println("Server closing connection to client.");
+	                        }
+		                	clientSocket.close();
 		                }
-		                if(debug)
-                        {
-	                		System.out.println("Server closing connection to client.");
-                        }
-	                	clientSocket.close();
+		                
 		            }
 		        }
 		        finally 
 		        {
-		        	
+		        	if(debug)
+	                {
+		        		System.out.println("Server closing.");
+	                }
+		            listener.close();
 		        }
-		        if(debug)
-                {
-	        		System.out.println("Server closing.");
-                }
-	            listener.close();
+		        
 	    
 	   }
 	     
@@ -197,10 +197,13 @@ public class Intermediate extends Thread
 	                    	
 	                    	if(debug)
 	                        {
-	                    		System.out.println("EOF frame received.");
+	                    		System.out.println("EOF frame received for Thread-ClientLink.");
+	                    		outServer.println(input);
+			                    outServer.flush();
 	                        }
 	                        break;
-	                    } else {
+	                    } else
+	                    {
 	
 		                    if(debug)
 		                    {
@@ -219,10 +222,11 @@ public class Intermediate extends Thread
 	                    
 	                }
 
-			} catch (IOException e) {
+			} catch (IOException e) 
+		   	{
 				// TODO Auto-generated catch block
 				//System.out.println("Problema while recibeACK"+i);
-				//e.printStackTrace();
+				e.printStackTrace();
 				//System.out.println("Problema while recibeACK");
 			}
 			
