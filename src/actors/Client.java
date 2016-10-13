@@ -31,8 +31,8 @@ public class Client {
 		
 		public  FileHandler fh = new FileHandler();
 		
-		public  String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
-		//private String filePath = "C:/Users/USUARIO/git/TP1_Redes/datosTP1.txt";
+		//public  String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
+		private String filePath = "C:/Users/USUARIO/git/TP1_Redes/datosTP1.txt";
 		
 		private  PrintWriter out;// = new PrintWriter(clientSocket.getOutputStream(), true);
 		
