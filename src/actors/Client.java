@@ -5,13 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-//import java.net.UnknownHostException;
-//import java.util.Date;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
-//import java.net.ServerSocket;
 import java.util.Scanner;
-//import javax.swing.JOptionPane;
+
 
 /**
  * Trivial client for the date server.
@@ -34,17 +31,17 @@ public class Client {
 		public  String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
 		//private String filePath = "C:/Users/USUARIO/git/TP1_Redes/datosTP1.txt";
 		
-		private  PrintWriter out;// = new PrintWriter(clientSocket.getOutputStream(), true);
+		private  PrintWriter out;
 		
 
 		public  String serverAddress="";
 		
-		public  Socket serverSocket; // = new Socket(serverAddress, port);
+		public  Socket serverSocket; 
 		
 		public  int port;//=9093; 
 		public  int windowSize;
 		public  int num1eroVentana=0; 
-		public  int totalFrames=0; //Programa debe cambiarlo al leer los datos
+		public  int totalFrames=0; 
 		public  long timeOut;//=1000; 
 		public  long inicializarTimeOut=Long.MIN_VALUE; //De este modo siempre sale que vencio el timeout si no se ha enviado el dato antes.
 		
@@ -55,26 +52,35 @@ public class Client {
 		public  BufferedReader in; 
 		
 		public Client() throws IOException{
-			setVariables(true);
+			setVariables(false);
 			//setVariables(false);
 			String datosEntrada = fh.readUsingBuffer(filePath);
 	        
 	        creandoEstrucNec(datosEntrada);
+
+
+	        serverAddress = "localhost"; 
+	        if (debugMode){
+	        	System.out.println("Client connecting to server at " + serverAddress + " in port "+port);
+            }
 	        
-	        
-	        
-	        //"C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
-	        serverAddress = "localhost"; //Mejor mantenerlo en local host para que funcione bien.
-	        System.out.println("Client connecting to server at " + serverAddress + " in port "+port);
 	        serverSocket = new Socket(serverAddress, port);
-	        System.out.println("Client conneted to server");
+	        
+	        if (debugMode){
+	        	System.out.println("Client conneted to server");
+            }
 	        out = new PrintWriter(serverSocket.getOutputStream(), true);
 	        
 	        
 	        in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-	        System.out.println("About to start both threads");
+	        if (debugMode){
+          	  System.out.println("About to start transmiting ");
+            }
 
 	        hiloRecibeACKEnviaDatos();
+	        if (debugMode){
+	          	  System.out.println("Closing the connection");
+	        }
 	        serverSocket.close();
 			
 			
@@ -123,18 +129,24 @@ public class Client {
 		public  void ponerDatosEnFrames(String datos){
 			mostrarPendientes();
 			mostrarVentana();
-			totalFrames=datos.length()-4;//////////////////////////////////Revisar esto
+			totalFrames=datos.length()-4;
 			Frame a;
-			System.out.println("Datos en frames");
+			if (debugMode){
+				System.out.println("Creando los frames de datos");
+			}
 			for(int i=0; i<totalFrames; i++){
 	              a = new Frame(i,inicializarTimeOut);
 	              char d=datos.charAt(i);
 	              a.setData(d);
 	              a.setIdFrame(i);
 	              colaPendientes.add(a);
-	              System.out.println("Frame "+a.getData()+" : "+a.getIdFrame());
+	              if (debugMode){
+	            	  System.out.print("Frame "+a.getData()+" : "+a.getIdFrame()+"  ,");
+	              }
 	         }
-			System.out.println("Sale crear frames: ");
+			System.out.println(" ");
+			//if (debugMode){}
+			//System.out.println("Sale crear frames: ");
 		}
 		
 		
@@ -149,17 +161,24 @@ public class Client {
 			}
 			Frame a;
 			Frame b;
-			System.out.println("Metiendo frames en la ventana: ");
+			if (debugMode){
+				System.out.println("Metiendo frames en la ventana: ");
+			}
 			for(int i=0; i<numElemPasar; i++){
 				a = colaPendientes.pop();
 				b=new Frame(a.getIdFrame(),inicializarTimeOut);
 				b.setData(a.getData());
-				System.out.print(b.getIdFrame()+": "+b.getData()+", ");
+				if (debugMode){
+					System.out.print(b.getIdFrame()+": "+b.getData()+", ");
+				}
 				colaVentana.addLast(b);
 			}
-			System.out.println( " ");
-			mostrarPendientes();
-			mostrarVentana();
+			System.out.println(" ");
+			if (debugMode){
+				System.out.println("La ventana y cola de pendientes iniciales (antes de comenzar a transmitir) quedaron de la siguiente manera: ");
+				mostrarPendientes();
+				mostrarVentana();
+			}
 		}
 		
 		
@@ -190,41 +209,53 @@ public class Client {
 		}
 		
 		//{}
-				public  void moverVentana(){
-					Frame a;
-					Frame b;
-					if(colaVentana.size()>0){
-						while ((colaPendientes.size()!=0)&&(colaVentana.getFirst()!=null) && (colaVentana.getFirst().getRecibido()==true)){
-							colaVentana.pop();
-							a = colaPendientes.pop();
-							b=new Frame(a.getIdFrame(),inicializarTimeOut);
-							b.setData(a.getData());
-							System.out.print(b.getIdFrame()+": "+b.getData()+", ");
-							colaVentana.addLast(b);
-							num1eroVentana=num1eroVentana+1;
-							mostrarVentana();
-						}
-						//while ((num1eroVentana!=totalFrames)&&(colaVentana.getFirst()!=null && colaVentana.getFirst().getRecibido()==true)){
-						while (colaVentana.size()!=0){
-							if(colaVentana.getFirst().getRecibido()==true){
-								a = colaVentana.pop();
-								num1eroVentana=num1eroVentana+1;
-								mostrarVentana();
-							}else {
-								break;
-							}
-						}
-					}
-					
+		public  void moverVentana(){
+			Frame a;
+			Frame b;
+			boolean cambio=false;
+			if(colaVentana.size()>0){
+				while ((colaPendientes.size()!=0)&&(colaVentana.getFirst()!=null) && (colaVentana.getFirst().getRecibido()==true)){
+					colaVentana.pop();
+					a = colaPendientes.pop();
+					b=new Frame(a.getIdFrame(),inicializarTimeOut);
+					b.setData(a.getData());
+					//System.out.print(b.getIdFrame()+": "+b.getData()+", ");
+					colaVentana.addLast(b);
+					num1eroVentana=num1eroVentana+1;
+					cambio=true;
+					//mostrarVentana();
 				}
+				while (colaVentana.size()!=0){
+					if(colaVentana.getFirst().getRecibido()==true){
+						cambio=true;
+						a = colaVentana.pop();
+						num1eroVentana=num1eroVentana+1;
+						//if (debugMode){}
+						//System.out.... La ventana ha quedado de la siguiente manera y los pendientes....
+						//mostrarVentana();
+					}else {
+						break;
+					}
+				}
+				if (debugMode&&cambio){
+					System.out.println("La ventana se corrio.");
+					System.out.println("La ventana y cola de pendientes quedaron de la siguiente manera: ");
+					mostrarVentana();
+					mostrarPendientes();
+				}
+			}
+					
+		}
 		
 		public  void enviarDatos(String datos) {//Hay que cambiarlo pero funciona temporalmente, creo
 			
-			System.out.println("Sending segment.");
-			System.out.println("Cliente enviando "+datos );
+			//System.out.println("Sending segment.");
+			if (debugMode){
+				System.out.println("Cliente frame: "+datos );
+			}
 			out.println(datos);
 			out.flush();
-			System.out.println("Segment sent.");
+			//System.out.println("Segment sent.");
 
 		}
 
@@ -245,7 +276,7 @@ public class Client {
 
 		        			input = in.readLine();
 		        		
-			        		System.out.println("After reading next ack.");
+			        		//System.out.println("After reading next ack.");
 							ack=ACKnumb(input);
 							index=ack-num1eroVentana;
 							if(index>-1){
@@ -258,6 +289,10 @@ public class Client {
 									if(a.getIdFrame()==ack){
 										a.setRecibido(true);
 										hayACKnuevo=true;
+										//if (debugMode){
+									//		System.out.println(ack);
+									//	}
+										//System. out numero de ack
 									}
 								}
 							}
@@ -268,9 +303,9 @@ public class Client {
 		        		}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					System.out.println("Problema while recibeACK"+i);
-					e.printStackTrace();
-					System.out.println("Problema while recibeACK");
+					//System.out.println("Problema while recibeACK"+i);
+					//e.printStackTrace();
+					//System.out.println("Problema while recibeACK");
 				}
 	        	i=i+1;
 	        	return false;
@@ -291,13 +326,18 @@ public class Client {
 					a=colaVentana.get(i);
 					time=TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
 					if((a.getTimeout()<time)&&(!a.getRecibido())){
-						System.out.println("Vencio time out "+a.getIdFrame()+":"+a.getData());
-
 						frame1=Integer.toString(a.getIdFrame())+":"+a.getData();
+						if (debugMode &&(a.getTimeout()!=inicializarTimeOut)){
+							System.out.println("Vencio time out "+a.getIdFrame()+":"+a.getData());
+						}
+						
 						enviarDatos(frame1);
 						a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
-						mostrarPendientes();
-						mostrarVentana();
+						/*
+						if (debugMode){
+							mostrarPendientes();
+							mostrarVentana();
+						}*/
 					}
 		         }
 			}
@@ -306,30 +346,33 @@ public class Client {
 		
 		
 		public void hiloRecibeACKEnviaDatos(){
-			System.out.println("Entro a hiloEnviaFrames");
 
 	        while (colaPendientes.size()!=0||colaVentana.size()!=0){
 	        	CicloRevisarTimeOut2();
 	        }
 	        enviarDatos(".");
+	        if (debugMode){
+	          	  System.out.println("End of transmition");
+	        }
 		}
 		
 		public int ACKnumb(String ack){
 			int trash=4;
-			System.out.println("ACK que entro: "+ack);
+			if (debugMode){
+				System.out.println("ACK que entro: "+ack);
+			}
 			String result="";
 			int numb=ack.length();
 			for(int e=trash;e<numb;++e){
 				result=result+ack.charAt(e);
 			}
-			System.out.println("Despues del for "+result );
 			return Integer.parseInt(result);
 		}
 		
 		
 		public static void main(String[] args) throws IOException {
 			Client cliente= new Client();
-			
+			System.out.println("Exiting the client");
 	        System.exit(0);
 
 	    }
