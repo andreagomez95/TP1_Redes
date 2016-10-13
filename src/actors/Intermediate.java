@@ -69,6 +69,7 @@ public class Intermediate extends Thread
 	      
 	      Intermediate T2 = new Intermediate( "Thread-ClientLink");
 	      T2.start();
+	     // System.exit(0);
 	   }   
 	   
 	   
@@ -89,7 +90,6 @@ public class Intermediate extends Thread
 		    * 
 		    * 
 		    * */
-		   		//ServerSocket listener = new ServerSocket(portClient);//Recibe cosas del cliente, escucha el puerto del cliente
 		        if(debug)
 		        {
 		        	System.out.println("Starting server at " + listener.getInetAddress() + " in port " + portClient);
@@ -105,16 +105,7 @@ public class Intermediate extends Thread
 		        	
 		            if(true) 
 		            {
-		            	/*
-		                clientSocket = listener.accept();
-		                outClient = new PrintWriter(clientSocket.getOutputStream(), true);
-		  	          //Lo que sale del cliente hacia el servidor
-		                inServer = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));//
-		    	      	//Lo que le entra al servidor desde el cliente
-		                inClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		  		      //Lo que le entra al cliente desde el server
-		  	          outServer = new PrintWriter(serverSocket.getOutputStream(), true);
-		  	          */
+
 		                //Acepta la conexion con el cliente (por eso usa el listener creado con la direccion del cliente)
 		                if(debug)
 		                {
@@ -130,7 +121,7 @@ public class Intermediate extends Thread
 		                        input = inServer.readLine();//Lo que le deberia entrar al servidor
 		                        System.out.println("Servidor recibio " + input);
 		                        //If the there are no more packages to send, the client will send a "." to message EOF.
-		                        if (input == null || input.equals(".")) 
+		                        if (input == null || ( input.compareTo(".")==0) )
 		                        {
 		                        	
 		                        	if(debug)
@@ -142,7 +133,7 @@ public class Intermediate extends Thread
 
 		                        if(debug)
 		                        {
-		                        	//System.out.println("Frame number " + sec + " received by server.");
+		                        	System.out.println("Frame received by Intermediate from server: " + input);
 		                        }
 		                        if(!isMissing()){
 			                        outClient.println(input);
@@ -150,27 +141,34 @@ public class Intermediate extends Thread
 		                        }
 		                        if(debug)
 		                        {
-		                        	System.out.println("Sending: " + input + "from client to server.");
+		                        	System.out.println("Intermediate sending: " + input + "from client to server.");
 		                        }
 		                        
 		                    }
 		                }catch (IOException e) 
 		                {
-		                	System.out.println("Error handling client : " + e);
+		                	//System.out.println("Error handling client : " + e);
 		                }    
 		                finally 
 		                {
-		                	System.out.println("Server closing connection to client.");
-		                	clientSocket.close();
+		                	
 		                }
+		                if(debug)
+                        {
+	                		System.out.println("Server closing connection to client.");
+                        }
+	                	clientSocket.close();
 		            }
 		        }
 		        finally 
 		        {
-		        	System.out.println("Server closing.");
-		            listener.close();
+		        	
 		        }
-	    	
+		        if(debug)
+                {
+	        		System.out.println("Server closing.");
+                }
+	            listener.close();
 	    
 	   }
 	     
@@ -202,20 +200,21 @@ public class Intermediate extends Thread
 	                    		System.out.println("EOF frame received.");
 	                        }
 	                        break;
-	                    }
+	                    } else {
 	
-	                    if(debug)
-	                    {
-	                    	//System.out.println("Frame number " + sec + " received by server.");
-	                    }
-	                    if(!isMissing()){
-				            outServer.println(input);
-		                    outServer.flush();
-		                }
-	                    
-	                    if(debug)
-	                    {
-	                    	System.out.println("Sending: " + input + "from server to client.");
+		                    if(debug)
+		                    {
+		                    	System.out.println("Frame received by Intermediate from server: " + input);
+		                    }
+		                    if(!isMissing()){
+					            outServer.println(input);
+			                    outServer.flush();
+			                }
+		                    
+		                    if(debug)
+		                    {
+		                    	System.out.println("Intermediate sending: " + input + "from server to client.");
+		                    }
 	                    }
 	                    
 	                }
@@ -223,7 +222,7 @@ public class Intermediate extends Thread
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				//System.out.println("Problema while recibeACK"+i);
-				e.printStackTrace();
+				//e.printStackTrace();
 				//System.out.println("Problema while recibeACK");
 			}
 			
@@ -247,135 +246,11 @@ public class Intermediate extends Thread
 	    	if(threadName.equals("Thread-ServerLink"))
 	    	{
 	    		clienteAServidor();
-	    		/*
-	    		if(debug)
-	            {
-	    			System.out.println("Intermediate client connecting to server at " + serverAddress + " in port " + portServer);
-	            }
-		        
-		        Socket serverSocket = new Socket(serverAddress, portServer);
-		        
-		        if(debug)
-	            {
-	    			System.out.println("Intermediate client connecting to client at " + serverAddress + " in port " + portClient);
-	            }
-		        
-		        Socket clientSocket = new Socket(serverAddress, portClient);
-		        if(debug)
-	            {
-		        	System.out.println("Intermediate client connected to server");
-	            }
-		        
-		        //out will send the ACKs to the client
-		        outServer = new PrintWriter(clientSocket.getOutputStream(), true);
-		        
-		        //in will receive the ACKs from the server
-		        inServer = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 
-		        String input = inServer.readLine();
-                if(debug)
-                {
-                	System.out.println("Acknowledge " + input + " received from server.");
-                }
-                
-                if(isMissing())
-                {
-                	if(debug)
-	                {
-	                	System.out.println("Acknowledge " + input + " lost.");
-	                }
-                }
-                else
-                {
-                	if(debug)
-	                {
-	                	System.out.println("Sending Acknowledge " + input + " to server.");
-	                }
-                	outServer.println(input);
-                }*/
 	    	}
 	    	else
 	    	{
-	    		/*
-	    		 ServerSocket clientConnection = new ServerSocket(portClient);
-	    		 
-		        if(debug)
-		        {
-		        	System.out.println("Starting intermediate server connection at " + clientConnection.getInetAddress() + " in port " + portClient);
-		        }
-		        try 
-		        {
-		        	if(debug)
-		            {
-		        		System.out.println("Intermediate server waiting to connect...");
-		            }
-		        	
-		            if(true) 
-		            {
-		                Socket clientSocket = clientConnection.accept();
-		                if(debug)
-		                {
-		                	System.out.println("Intermediate server connected to " + clientSocket.getInetAddress());
-		                }
-		                
-		                Socket serverSocket = new Socket(serverAddress, portServer);
-		                
-		                if(debug)
-		                {
-		                	System.out.println("Intermediate server connected to " + serverSocket.getInetAddress());
-		                }
-		                
-		                try 
-		                {
-		                	//in will receive the frames from the client
-		                	inClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		
-		                	//out will send the frames to the server
-		                    outClient = new PrintWriter(serverSocket.getOutputStream(), true);
-		                    
-		                    String input = " ";
-		                    //The main loop of the server that receives the frames from the client and returns acknowledges to it.
-		                    while (true) 
-		                    {
-		                        input = inClient.readLine();
-		                        if(debug)
-	    		                {
-	    		                	System.out.println("Packet " + input + " received from client.");
-	    		                }
-		                        
-		                        if(isMissing())
-		                        {
-		                        	if(debug)
-		    		                {
-		    		                	System.out.println("Packet " + input + " lost.");
-		    		                }
-		                        }
-		                        else
-		                        {
-		                        	if(debug)
-		    		                {
-		    		                	System.out.println("Sending packet " + input + " to server.");
-		    		                }
-		                        	outClient.println(input);
-		                        }
-		                    }
-		                }
-		                catch (IOException e) 
-		                {
-		                	System.out.println("Error handling client : " + e);
-		                }    
-		                finally 
-		                {
-		                	System.out.println("Intermediate closing its connection to client.");
-		                	clientSocket.close();
-		                }
-		            }
-		        }
-		        finally 
-		        {
-		        	System.out.println("Intermediate closing.");
-		        	clientConnection.close();
-		        }*/
+	    		
 	    		servidorACliente();
 	    	}
 	   }
