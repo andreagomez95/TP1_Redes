@@ -25,8 +25,8 @@ public class Server
 	
 	private FileHandler fileHandler = new FileHandler();
 	
-	//private String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/outputTP1.txt";
-	private String filePath = "C:/Users/USUARIO/git/TP1_Redes/outputTP1.txt";
+	private String filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/outputTP1.txt";
+	//private String filePath = "C:/Users/USUARIO/git/TP1_Redes/outputTP1.txt";
 	
 	private Queue<Frame> receivedQueue = new LinkedList<Frame>();
 	
