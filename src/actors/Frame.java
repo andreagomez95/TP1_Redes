@@ -11,6 +11,8 @@ public class Frame
 	
 	private int idFrame;
 	
+	private int numVecesEnviado;
+	
 	private char data;
 	
 	public Frame(int id, long time) 
@@ -19,6 +21,7 @@ public class Frame
 		data = ' ';
 		recibido = false;
 		timeout = time;
+		numVecesEnviado=0;
 	}
 	
 	public void setIdFrame(int dato){
@@ -48,6 +51,13 @@ public class Frame
 	}
 	public long getTimeout(){
 		return timeout;
+	}
+	public int getVecesEnviado(){
+		return numVecesEnviado;
+	}
+	
+	public void setEnviando(int i){
+		numVecesEnviado=i;
 	}
 
 }

@@ -51,9 +51,12 @@ public class Client {
 		
 		public  BufferedReader in; 
 		
+		public int enviadosUnaVez;
+		
 		public Client() throws IOException{
-			setVariables(false);
+			enviadosUnaVez=0;
 			//setVariables(false);
+			setVariables(true);
 			String datosEntrada = fh.readUsingBuffer(filePath);
 	        
 	        creandoEstrucNec(datosEntrada);
@@ -111,13 +114,13 @@ public class Client {
 				timeOut = scan.nextInt();
 			} else {
 
-				windowSize = 4;
+				windowSize = 1;
 
-				port = 9093;
+				port = 9094;
 				
 				debugMode= true;
 				
-				timeOut = 10;
+				timeOut = 1000000;
 			}
 			
 			scan.close();
@@ -130,6 +133,7 @@ public class Client {
 			mostrarPendientes();
 			mostrarVentana();
 			totalFrames=datos.length()-4;
+			//System.out.print("Datos  "+datos.length());
 			Frame a;
 			if (debugMode){
 				System.out.println("Creando los frames de datos");
@@ -212,11 +216,16 @@ public class Client {
 		public  void moverVentana(){
 			Frame a;
 			Frame b;
+			Frame c;
 			boolean cambio=false;
 			if(colaVentana.size()>0){
 				while ((colaPendientes.size()!=0)&&(colaVentana.getFirst()!=null) && (colaVentana.getFirst().getRecibido()==true)){
-					colaVentana.pop();
+					c=colaVentana.pop();
 					a = colaPendientes.pop();
+					if(c.getVecesEnviado()==1){
+						enviadosUnaVez=enviadosUnaVez+1;
+					}
+					//System.out.println("/////////////////////////NumVecesEnviados= "+c.getVecesEnviado()+" frame "+c.getIdFrame());
 					b=new Frame(a.getIdFrame(),inicializarTimeOut);
 					b.setData(a.getData());
 					//System.out.print(b.getIdFrame()+": "+b.getData()+", ");
@@ -229,6 +238,11 @@ public class Client {
 					if(colaVentana.getFirst().getRecibido()==true){
 						cambio=true;
 						a = colaVentana.pop();
+						if(a.getVecesEnviado()==1){
+							enviadosUnaVez=enviadosUnaVez+1;
+						} //else {
+						//System.out.println("/////////////////////////NumVecesEnviados= "+a.getVecesEnviado()+" frame "+a.getIdFrame());
+						//}
 						num1eroVentana=num1eroVentana+1;
 						//if (debugMode){}
 						//System.out.... La ventana ha quedado de la siguiente manera y los pendientes....
@@ -332,6 +346,7 @@ public class Client {
 						}
 						
 						enviarDatos(frame1);
+						a.setEnviando(a.getVecesEnviado()+1);
 						a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
 						/*
 						if (debugMode){
@@ -372,6 +387,8 @@ public class Client {
 		
 		public static void main(String[] args) throws IOException {
 			Client cliente= new Client();
+			System.out.println("Total de frames: " +cliente.totalFrames);
+			System.out.println("Total de frames enviados solo una vez: " +cliente.enviadosUnaVez);
 			System.out.println("Exiting the client");
 	        System.exit(0);
 
