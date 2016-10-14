@@ -229,7 +229,8 @@ public class Server
     		windowSize = 4;
     		port = 9090;
     		debug = false;
-    		filePath = "C:/Users/USUARIO/git/TP1_Redes/outputTP1.txt";
+    		//filePath = "C:/Users/USUARIO/git/TP1_Redes/outputTP1.txt";
+    		filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
     	}
     	
         if(windowSize != 0 && port != 0)
