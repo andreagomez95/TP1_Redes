@@ -57,7 +57,7 @@ public class Server
     {
     	//On true, asks the user to input the necessary data for the program to run
     	//On false, sets the values by default
-    	if(getInput(false))
+    	if(getInput(true))
     	{
 	        ServerSocket listener = new ServerSocket(port);
 	        if(debug)

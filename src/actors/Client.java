@@ -55,8 +55,8 @@ public class Client {
 		
 		public Client() throws IOException{
 			enviadosUnaVez=0;
-			//setVariables(false);
-			setVariables(true);
+			setVariables(false);
+			//setVariables(true);
 			
 			String datosEntrada = fh.readUsingBuffer(filePath);
 	        

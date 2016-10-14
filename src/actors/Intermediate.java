@@ -45,7 +45,7 @@ public class Intermediate extends Thread
 	
 	   public static void main(String args[])  throws IOException
 	   {
-		   getInput(false);
+		   getInput(true);
 		   
 		   serverSocket = new Socket(serverAddress, portServer);//Para conectarse con el servidor
 		      listener = new ServerSocket(portClient);
@@ -137,7 +137,7 @@ public class Intermediate extends Thread
 					                    System.out.println("Intermediate sending: " + input + "from server to client.");
 					                } else 
 				                    {
-				                    	System.out.println(input + "is missing.");
+				                    	System.out.println(input + " is missing.");
 				                    }
 			                    }
 		                        
@@ -181,8 +181,7 @@ public class Intermediate extends Thread
 					while (true) 
 	                {
 	                    input = inClient.readLine();//Lo que le deberia entrar al servidor
-	                    //System.out.println("Servidor recibio " + input);
-	                    //If the there are no more packages to send, the client will send a "." to message EOF.
+
 	                    if (input == null || input.equals(".")) 
 	                    {
 	                    	
@@ -212,7 +211,7 @@ public class Intermediate extends Thread
 				                    System.out.println("Intermediate sending: " + input + "from client to server.");
 				                } else 
 			                    {
-			                    	System.out.println(input + "is missing.");
+			                    	System.out.println(input + " is missing.");
 			                    }
 		                    }
 	                    }
