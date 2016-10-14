@@ -57,7 +57,7 @@ public class Server
     {
     	//On true, asks the user to input the necessary data for the program to run
     	//On false, sets the values by default
-    	if(getInput(false))
+    	if(getInput(true))
     	{
 	        ServerSocket listener = new ServerSocket(port);
 	        if(debug)
@@ -229,7 +229,8 @@ public class Server
     		windowSize = 4;
     		port = 9090;
     		debug = false;
-    		filePath = "C:/Users/USUARIO/git/TP1_Redes/outputTP1.txt";
+    		//filePath = "C:/Users/USUARIO/git/TP1_Redes/outputTP1.txt";
+    		filePath = "C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt";
     	}
     	
         if(windowSize != 0 && port != 0)
