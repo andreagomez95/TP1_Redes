@@ -55,8 +55,9 @@ public class Server
     
     public Server() throws IOException 
     {
-    	//Asks the user to input the necessary data for the program to run
-    	if(getInput())
+    	//On true, asks the user to input the necessary data for the program to run
+    	//On false, sets the values by default
+    	if(getInput(false))
     	{
 	        ServerSocket listener = new ServerSocket(port);
 	        if(debug)
@@ -197,29 +198,43 @@ public class Server
         }
     }
     
-    public boolean getInput()//Obtener del usuario el modo en el que se va a correr el programa.
+    public boolean getInput(boolean test)//Obtener del usuario el modo en el que se va a correr el programa.
     {
-    	Scanner scan = new Scanner(System.in);
-        System.out.println("Input window size: ");
-        windowSize = Integer.parseInt(scan.nextLine());
-        System.out.println("Input port to connect to: ");
-        port = Integer.parseInt(scan.nextLine());
-        System.out.println("Input debug of display debug?(y/n): ");
-        String mode = scan.nextLine();
-        
-        
-        if(mode.equalsIgnoreCase("y"))
-        {
-        	debug = true;
-        }
-        else
-        {
-        	debug = false;
-        }
-        
-        scan.close();
+    	if(test)
+    	{
+    		Scanner scan = new Scanner(System.in);
+            System.out.println("Input window size: ");
+            windowSize = Integer.parseInt(scan.nextLine());
+            System.out.println("Input port to connect to: ");
+            port = Integer.parseInt(scan.nextLine());
+            System.out.println("Input file path to write the output: ");
+            filePath = scan.nextLine();
+            System.out.println("Input debug of display debug?(y/n): ");
+            String mode = scan.nextLine();
+            
+            
+            if(mode.equalsIgnoreCase("y"))
+            {
+            	debug = true;
+            }
+            else
+            {
+            	debug = false;
+            }
+            
+            scan.close();
+    	}
+    	else
+    	{
+    		windowSize = 4;
+    		port = 9090;
+    		debug = false;
+    		filePath = "C:/Users/USUARIO/git/TP1_Redes/outputTP1.txt";
+    	}
+    	
         if(windowSize != 0 && port != 0)
         {
+        	
         	return true;
         }
         return false;

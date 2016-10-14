@@ -45,7 +45,7 @@ public class Intermediate extends Thread
 	
 	   public static void main(String args[])  throws IOException
 	   {
-		   getInput();
+		   getInput(false);
 		   
 		   serverSocket = new Socket(serverAddress, portServer);//Para conectarse con el servidor
 		      listener = new ServerSocket(portClient);
@@ -288,29 +288,40 @@ public class Intermediate extends Thread
 	      }
 	   }
 	   
-	   public static void getInput()
+	   public static void getInput(boolean test)
 	    {
-	    	Scanner scan = new Scanner(System.in);
-	        System.out.println("Input the port to connect to the server: ");
-	        portServer = Integer.parseInt(scan.nextLine());
-	        System.out.println("Input the port to connect to the client: ");
-	        portClient = Integer.parseInt(scan.nextLine());
-	        System.out.println("Input the probability p of missing frames: ");
-	        p = Integer.parseInt(scan.nextLine());
-	        System.out.println("Input debug of display debug?(y/n): ");
-	        String mode = scan.nextLine();
-	        
-	        
-	        if(mode.equalsIgnoreCase("y"))
-	        {
-	        	debug = true;
-	        }
-	        else
-	        {
-	        	debug = false;
-	        }
-	        
-	        scan.close();
+		   if(test)
+		   {
+			   Scanner scan = new Scanner(System.in);
+		        System.out.println("Input the port to connect to the server: ");
+		        portServer = Integer.parseInt(scan.nextLine());
+		        System.out.println("Input the port to connect to the client: ");
+		        portClient = Integer.parseInt(scan.nextLine());
+		        System.out.println("Input the probability p of missing frames: ");
+		        p = Integer.parseInt(scan.nextLine());
+		        System.out.println("Input debug of display debug?(y/n): ");
+		        String mode = scan.nextLine();
+		        
+		        
+		        if(mode.equalsIgnoreCase("y"))
+		        {
+		        	debug = true;
+		        }
+		        else
+		        {
+		        	debug = false;
+		        }
+		        
+		        scan.close();
+		   }
+		   else
+		   {
+			   portServer = 9090;
+			   portClient = 9093;
+			   p = 20;
+			   debug = false;
+		   }
+	    	
 	    }
 	   
 	   public boolean isMissing()
