@@ -128,13 +128,11 @@ public class Client {
 		}
 		
 		
-		//C:/Users/DELL/Documents/GitHub/TP1_Redes/datosTP1.txt
 		//Mete los datos del archivo indicado en los diferentes frames
 		public  void ponerDatosEnFrames(String datos){
 			mostrarPendientes();
 			mostrarVentana();
 			totalFrames=datos.length()-4;
-			//System.out.print("Datos  "+datos.length());
 			Frame a;
 			if (debugMode){
 				System.out.println("Creando los frames de datos");
@@ -150,8 +148,6 @@ public class Client {
 	              }
 	         }
 			System.out.println(" ");
-			//if (debugMode){}
-			//System.out.println("Sale crear frames: ");
 		}
 		
 		
@@ -226,14 +222,11 @@ public class Client {
 					if(c.getVecesEnviado()==1){
 						enviadosUnaVez=enviadosUnaVez+1;
 					}
-					//System.out.println("/////////////////////////NumVecesEnviados= "+c.getVecesEnviado()+" frame "+c.getIdFrame());
 					b=new Frame(a.getIdFrame(),inicializarTimeOut);
 					b.setData(a.getData());
-					//System.out.print(b.getIdFrame()+": "+b.getData()+", ");
 					colaVentana.addLast(b);
 					num1eroVentana=num1eroVentana+1;
 					cambio=true;
-					//mostrarVentana();
 				}
 				while (colaVentana.size()!=0){
 					if(colaVentana.getFirst().getRecibido()==true){
@@ -241,13 +234,9 @@ public class Client {
 						a = colaVentana.pop();
 						if(a.getVecesEnviado()==1){
 							enviadosUnaVez=enviadosUnaVez+1;
-						} //else {
-						//System.out.println("/////////////////////////NumVecesEnviados= "+a.getVecesEnviado()+" frame "+a.getIdFrame());
-						//}
+						}
 						num1eroVentana=num1eroVentana+1;
-						//if (debugMode){}
-						//System.out.... La ventana ha quedado de la siguiente manera y los pendientes....
-						//mostrarVentana();
+
 					}else {
 						break;
 					}
@@ -263,15 +252,12 @@ public class Client {
 		}
 		
 		public  void enviarDatos(String datos) {//Hay que cambiarlo pero funciona temporalmente, creo
-			
-			//System.out.println("Sending segment.");
+
 			if (debugMode){
 				System.out.println("Cliente frame: "+datos );
 			}
 			out.println(datos);
 			out.flush();
-			//System.out.println("Segment sent.");
-
 		}
 
 		
@@ -291,7 +277,6 @@ public class Client {
 
 		        			input = in.readLine();
 		        		
-			        		//System.out.println("After reading next ack.");
 							ack=ACKnumb(input);
 							index=ack-num1eroVentana;
 							if(index>-1){
@@ -304,10 +289,7 @@ public class Client {
 									if(a.getIdFrame()==ack){
 										a.setRecibido(true);
 										hayACKnuevo=true;
-										//if (debugMode){
-									//		System.out.println(ack);
-									//	}
-										//System. out numero de ack
+
 									}
 								}
 							}
@@ -317,10 +299,7 @@ public class Client {
 		        			return false;
 		        		}
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					//System.out.println("Problema while recibeACK"+i);
-					//e.printStackTrace();
-					//System.out.println("Problema while recibeACK");
+
 				}
 	        	i=i+1;
 	        	return false;
@@ -349,11 +328,7 @@ public class Client {
 						enviarDatos(frame1);
 						a.setEnviando(a.getVecesEnviado()+1);
 						a.setTimeout((TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis())+timeOut));
-						/*
-						if (debugMode){
-							mostrarPendientes();
-							mostrarVentana();
-						}*/
+
 					}
 		         }
 			}
