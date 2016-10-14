@@ -23,7 +23,7 @@ public class Client {
 	
 		//Variables globales
 		public  boolean hayACKnuevo=false;
-		
+		public static long tiempoEmpieza;
 		public  boolean debugMode=false;
 		
 		public  FileHandler fh = new FileHandler();
@@ -57,10 +57,11 @@ public class Client {
 			enviadosUnaVez=0;
 			//setVariables(false);
 			setVariables(true);
+			
 			String datosEntrada = fh.readUsingBuffer(filePath);
 	        
 	        creandoEstrucNec(datosEntrada);
-
+	        tiempoEmpieza = System.currentTimeMillis();
 
 	        serverAddress = "localhost"; 
 	        if (debugMode){
@@ -116,7 +117,7 @@ public class Client {
 
 				windowSize = 1;
 
-				port = 9094;
+				port = 9093;
 				
 				debugMode= true;
 				
@@ -389,6 +390,9 @@ public class Client {
 			Client cliente= new Client();
 			System.out.println("Total de frames: " +cliente.totalFrames);
 			System.out.println("Total de frames enviados solo una vez: " +cliente.enviadosUnaVez);
+			long tiempoTermina  = System.currentTimeMillis();
+			long tiempoTotal = tiempoTermina - tiempoEmpieza;
+			System.out.println("Tiempo total de la ejecucion de la simulacion en milisegundos = "+tiempoTotal);
 			System.out.println("Exiting the client");
 	        System.exit(0);
 
