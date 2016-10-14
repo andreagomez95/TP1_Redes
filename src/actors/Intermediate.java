@@ -318,7 +318,7 @@ public class Intermediate extends Thread
 		   {
 			   portServer = 9090;
 			   portClient = 9093;
-			   p = 5;
+			   p = 25;
 			   debug = false;
 		   }
 	    	
