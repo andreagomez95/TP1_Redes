@@ -1,1 +1,1 @@
-abcdefghijklmnopqrstuvwxyz1234567890
+Resumen-El-presente-proyecto-pretende-implementar-una-simulación-del-protocolo-de-la-capa-de-enlace-Selective-Repeat-con-el-fin-de-visualizar-y-comprender-cómo-funciona-dicho-algoritmo-en-la-v
