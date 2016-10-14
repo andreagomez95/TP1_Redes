@@ -119,7 +119,7 @@ public class Client {
 
 				port = 9093;
 				
-				debugMode= true;
+				debugMode= false;
 				
 				timeOut = 1000000;
 			}
