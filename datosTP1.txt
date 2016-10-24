@@ -1,5 +1,2 @@
-<<<<<<< HEAD
 Resumen-El-presente-proyecto-pretende-implementar-una-simulación-del-protocolo-de-la-capa-de-enlace-Selective-Repeat-con-el-fin-de-visualizar-y-comprender-cómo-funciona-dicho-algoritmo-en-la-vida-real--En-efecto,-la-adición-de-un-intermediario-que-intercepta-y-a-veces-elimina-los-datos-(frames)-que-el-servidor-y-el-cliente-intercambian-provee-una-aproximación-a-la-verdadera-interacción-que-ocurre-entre-un-emisor-y-un-receptor-en-una-red--Palabras-clave--selective-repeat,-emisor,-receptor,-intermediario,-frame-Descripción-de-Selective-RepeatSelective-Repeat-es-un-protoco
-=======
-abcdefghijklmnopqrstuvwxyz1234567890
->>>>>>> refs/remotes/origin/master
+

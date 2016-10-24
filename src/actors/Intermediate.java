@@ -188,9 +188,10 @@ public class Intermediate extends Thread
 	                    	if(debug)
 	                        {
 	                    		System.out.println("EOF frame received for Thread-ClientLink.");
-	                    		outServer.println(input);
-			                    outServer.flush();
-	                        }
+	                    		
+	                        }	
+	                    	outServer.println(input);
+		                    outServer.flush();
 	                        break;
 	                    } else
 	                    {
