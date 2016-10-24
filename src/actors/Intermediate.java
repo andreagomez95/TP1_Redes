@@ -193,24 +193,29 @@ public class Intermediate extends Thread
 	                    	outServer.println(input);
 		                    outServer.flush();
 	                        break;
-	                    } else
+	                    }
+	                    else
 	                    {
 	
 		                    if(debug)
 		                    {
 		                    	System.out.println("Intermediate receive: " + input + " from client. Do you want to send this frame? (y/n) ");
 		                    	String j = scan.nextLine();
-		                    	if(j.equalsIgnoreCase("y")){
+		                    	if(j.equalsIgnoreCase("y"))
+		                    	{
 		                    		outServer.println(input);
 				                    outServer.flush();
 				                    System.out.println("Intermediate sending: " + input + "from client to server.");
 		        				}
-		                    } else {
+		                    } 
+		                    else
+		                    {
 			                    if(!isMissing()){
 						            outServer.println(input);
 				                    outServer.flush();
 				                    System.out.println("Intermediate sending: " + input + "from client to server.");
-				                } else 
+				                } 
+			                    else 
 			                    {
 			                    	System.out.println(input + " is missing.");
 			                    }
